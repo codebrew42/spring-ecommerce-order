@@ -36,19 +36,3 @@ data class ProductOptionResponse(
     val name: String,
     val quantity: Int,
 )
-
-fun Product.toResponse() =
-    ProductResponse(
-        id = id,
-        name = name,
-        price = price,
-        quantity = quantity,
-        imageUrl = imageUrl,
-    )
-
-fun ProductOption.toResponse() =
-    ProductOptionResponse(
-        id = id,
-        name = name,
-        quantity = quantity,
-    )
