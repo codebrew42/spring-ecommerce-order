@@ -2,6 +2,7 @@ package ecommerce.controller
 
 import ecommerce.dto.CreateProductRequest
 import ecommerce.dto.ProductOptionRequest
+import ecommerce.dto.ProductPatchRequest
 import ecommerce.dto.UpdateProductRequest
 import ecommerce.model.Product
 import ecommerce.model.ProductOption
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -50,6 +52,15 @@ class AdminController(private val productService: ProductService, private val pr
         @PathVariable id: Long,
     ): ResponseEntity<Product> {
         val updated = productService.updateProduct(id, productRequest)
+        return ResponseEntity.ok(updated)
+    }
+
+    @PatchMapping("/{id}")
+    fun patchProduct(
+        @Valid @RequestBody productRequest: ProductPatchRequest,
+        @PathVariable id: Long,
+    ): ResponseEntity<Product> {
+        val updated = productService.patchProduct(id, productRequest)
         return ResponseEntity.ok(updated)
     }
 

@@ -1,6 +1,7 @@
 package ecommerce.service
 
 import ecommerce.dto.CreateProductRequest
+import ecommerce.dto.ProductPatchRequest
 import ecommerce.dto.UpdateProductRequest
 import ecommerce.exception.DuplicateNameException
 import ecommerce.exception.InsufficientProductOptionsException
@@ -62,14 +63,30 @@ class ProductService(
             productRepository.findByIdOrNull(id)
                 ?: throw NotFoundException("Product with id $id not found")
 
+        if (request.name != existingProduct.name && productRepository.existsByName(request.name)) {
+            throw DuplicateNameException("Product name already exists")
+        }
+
+        val updatedProduct = request.toModel(id)
+        return productRepository.save(updatedProduct)
+    }
+
+    @Transactional
+    fun patchProduct(
+        id: Long,
+        request: ProductPatchRequest,
+    ): Product {
+        val existingProduct =
+            productRepository.findByIdOrNull(id)
+                ?: throw NotFoundException("Product with id $id not found")
+
         request.name?.let { newName ->
             if (newName != existingProduct.name && productRepository.existsByName(newName)) {
                 throw DuplicateNameException("Product name already exists")
             }
         }
-
-        val updatedProduct = request.toModel(id, existingProduct)
-        return productRepository.save(updatedProduct)
+        val patchedProduct = request.toModel(id, existingProduct)
+        return productRepository.save(patchedProduct)
     }
 
     fun deleteById(id: Long) {

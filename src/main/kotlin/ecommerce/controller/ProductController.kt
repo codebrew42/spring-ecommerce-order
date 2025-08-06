@@ -1,6 +1,7 @@
 package ecommerce.controller
 
 import ecommerce.dto.CreateProductRequest
+import ecommerce.dto.ProductPatchRequest
 import ecommerce.dto.UpdateProductRequest
 import ecommerce.model.Product
 import ecommerce.service.ProductService
@@ -52,10 +53,10 @@ class ProductController(private val productService: ProductService) {
 
     @PatchMapping("/{id}")
     fun updateProductPartially(
-        @Valid @RequestBody productRequest: UpdateProductRequest,
+        @Valid @RequestBody productRequest: ProductPatchRequest,
         @PathVariable id: Long,
     ): Product {
-        return productService.updateProduct(id, productRequest)
+        return productService.patchProduct(id, productRequest)
     }
 
     @DeleteMapping("/{id}")

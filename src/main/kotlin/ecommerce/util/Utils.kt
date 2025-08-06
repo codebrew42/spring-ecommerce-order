@@ -1,15 +1,24 @@
 package ecommerce.util
 
 import ecommerce.dto.CreateProductRequest
+import ecommerce.dto.ProductPatchRequest
 import ecommerce.dto.UpdateProductRequest
 import ecommerce.dto.member.RegisterRequest
 import ecommerce.model.Member
 import ecommerce.model.Product
-import ecommerce.model.ProductOption
 
 fun CreateProductRequest.toModel(id: Long? = null) = Product(name, price, quantity, imageUrl, id)
 
-fun UpdateProductRequest.toModel(
+fun UpdateProductRequest.toModel(id: Long) =
+    Product(
+        name = name,
+        price = price,
+        quantity = quantity,
+        imageUrl = imageUrl,
+        id = id,
+    )
+
+fun ProductPatchRequest.toModel(
     id: Long,
     existingProduct: Product,
 ) = Product(

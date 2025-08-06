@@ -3,9 +3,9 @@ package ecommerce.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import ecommerce.dto.CreateProductRequest
 import ecommerce.dto.ProductOptionRequest
+import ecommerce.dto.ProductPatchRequest
 import ecommerce.dto.UpdateProductRequest
 import ecommerce.model.Member
-import ecommerce.model.Product
 import ecommerce.model.Role
 import ecommerce.service.TokenService
 import org.junit.jupiter.api.Test
@@ -18,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import org.springframework.transaction.annotation.Transactional
@@ -272,12 +273,6 @@ class AdminControllerTest {
             objectMapper.readTree(createdProductResponse.response.contentAsString)
                 .get("id").asLong()
 
-        val product =
-            objectMapper.readValue(
-                createdProductResponse.response.contentAsString,
-                Product::class.java,
-            )
-
         val productOptionRequest =
             ProductOptionRequest(
                 name = "Red Color",
@@ -323,12 +318,6 @@ class AdminControllerTest {
         val productId =
             objectMapper.readTree(createdProductResponse.response.contentAsString)
                 .get("id").asLong()
-
-        val product =
-            objectMapper.readValue(
-                createdProductResponse.response.contentAsString,
-                Product::class.java,
-            )
 
         val invalidOptionRequest =
             ProductOptionRequest(
@@ -547,6 +536,310 @@ class AdminControllerTest {
             content = objectMapper.writeValueAsString(updateRequest)
         }.andExpect {
             status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `should patch product with single field successfully`() {
+        val adminToken = createAdminToken()
+
+        val originalProduct =
+            CreateProductRequest(
+                name = "OriginalPatch",
+                price = 50.0,
+                quantity = 5,
+                imageUrl = "https://example.com/original.jpg",
+                productOptions = listOf(ProductOptionRequest("black", 20, 6L)),
+            )
+
+        val createdProductResponse =
+            mockMvc.post("/api/admin/products") {
+                header("Authorization", "Bearer $adminToken")
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(originalProduct)
+            }.andExpect {
+                status { isCreated() }
+            }.andReturn()
+
+        val productId =
+            objectMapper.readTree(createdProductResponse.response.contentAsString)
+                .get("id").asLong()
+
+        val patchRequest = ProductPatchRequest(name = "PatchedName")
+
+        mockMvc.patch("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(patchRequest)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.name") { value("PatchedName") }
+            jsonPath("$.price") { value(50.0) }
+            jsonPath("$.quantity") { value(5) }
+            jsonPath("$.imageUrl") { value("https://example.com/original.jpg") }
+        }
+    }
+
+    @Test
+    fun `should patch product with multiple fields successfully`() {
+        val adminToken = createAdminToken()
+
+        val originalProduct =
+            CreateProductRequest(
+                name = "MultiPatch",
+                price = 100.0,
+                quantity = 10,
+                imageUrl = "https://example.com/multi.jpg",
+                productOptions = listOf(ProductOptionRequest("blue", 15, 6L)),
+            )
+
+        val createdProductResponse =
+            mockMvc.post("/api/admin/products") {
+                header("Authorization", "Bearer $adminToken")
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(originalProduct)
+            }.andExpect {
+                status { isCreated() }
+            }.andReturn()
+
+        val productId =
+            objectMapper.readTree(createdProductResponse.response.contentAsString)
+                .get("id").asLong()
+
+        val patchRequest =
+            ProductPatchRequest(
+                price = 150.0,
+                quantity = 20,
+            )
+
+        mockMvc.patch("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(patchRequest)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.name") { value("MultiPatch") }
+            jsonPath("$.price") { value(150.0) }
+            jsonPath("$.quantity") { value(20) }
+            jsonPath("$.imageUrl") { value("https://example.com/multi.jpg") }
+        }
+    }
+
+    @Test
+    fun `should return 400 when patching with invalid data`() {
+        val adminToken = createAdminToken()
+
+        val originalProduct =
+            CreateProductRequest(
+                name = "ValidProduct",
+                price = 50.0,
+                quantity = 5,
+                imageUrl = "https://example.com/valid.jpg",
+                productOptions = listOf(ProductOptionRequest("green", 10, 6L)),
+            )
+
+        val createdProductResponse =
+            mockMvc.post("/api/admin/products") {
+                header("Authorization", "Bearer $adminToken")
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(originalProduct)
+            }.andExpect {
+                status { isCreated() }
+            }.andReturn()
+
+        val productId =
+            objectMapper.readTree(createdProductResponse.response.contentAsString)
+                .get("id").asLong()
+
+        val invalidPatchRequest =
+            ProductPatchRequest(
+                price = -10.0,
+                quantity = 0,
+            )
+
+        mockMvc.patch("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(invalidPatchRequest)
+        }.andExpect {
+            status { isBadRequest() }
+        }
+    }
+
+    @Test
+    fun `should return 409 when patching with duplicate name`() {
+        val adminToken = createAdminToken()
+
+        val firstProduct =
+            CreateProductRequest(
+                name = "FirstProduct",
+                price = 50.0,
+                quantity = 5,
+                imageUrl = "https://example.com/first.jpg",
+                productOptions = listOf(ProductOptionRequest("red", 8, 6L)),
+            )
+
+        mockMvc.post("/api/admin/products") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(firstProduct)
+        }.andExpect {
+            status { isCreated() }
+        }
+
+        val secondProduct =
+            CreateProductRequest(
+                name = "SecondProduct",
+                price = 75.0,
+                quantity = 8,
+                imageUrl = "https://example.com/second.jpg",
+                productOptions = listOf(ProductOptionRequest("yellow", 12, 6L)),
+            )
+
+        val createdSecondResponse =
+            mockMvc.post("/api/admin/products") {
+                header("Authorization", "Bearer $adminToken")
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(secondProduct)
+            }.andExpect {
+                status { isCreated() }
+            }.andReturn()
+
+        val secondProductId =
+            objectMapper.readTree(createdSecondResponse.response.contentAsString)
+                .get("id").asLong()
+
+        val conflictPatchRequest = ProductPatchRequest(name = "FirstProduct")
+
+        mockMvc.patch("/api/admin/products/$secondProductId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(conflictPatchRequest)
+        }.andExpect {
+            status { isConflict() }
+        }
+    }
+
+    @Test
+    fun `should return 404 when patching non-existent product`() {
+        val adminToken = createAdminToken()
+
+        val patchRequest = ProductPatchRequest(name = "NonExistent")
+
+        mockMvc.patch("/api/admin/products/999999") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(patchRequest)
+        }.andExpect {
+            status { isNotFound() }
+        }
+    }
+
+    @Test
+    fun `should return 400 when PUT with missing required fields`() {
+        val adminToken = createAdminToken()
+
+        val originalProduct =
+            CreateProductRequest(
+                name = "FieldsTest",
+                price = 50.0,
+                quantity = 5,
+                imageUrl = "https://example.com/required.jpg",
+                productOptions = listOf(ProductOptionRequest("purple", 12, 6L)),
+            )
+
+        val createdProductResponse =
+            mockMvc.post("/api/admin/products") {
+                header("Authorization", "Bearer $adminToken")
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(originalProduct)
+            }.andExpect {
+                status { isCreated() }
+            }.andReturn()
+
+        val productId =
+            objectMapper.readTree(createdProductResponse.response.contentAsString)
+                .get("id").asLong()
+
+        val nullFieldsJson = """{"name": "ValidName", "price": null, "quantity": 10, "imageUrl": "https://test.com"}"""
+
+        mockMvc.put("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = nullFieldsJson
+        }.andExpect {
+            status { isBadRequest() }
+        }
+
+        val missingFieldJson = """{"name": "OnlyName"}"""
+
+        mockMvc.put("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = missingFieldJson
+        }.andExpect {
+            status { isBadRequest() }
+        }
+    }
+
+    @Test
+    fun `should demonstrate PUT vs PATCH semantics`() {
+        val adminToken = createAdminToken()
+
+        val originalProduct =
+            CreateProductRequest(
+                name = "SemanticsTest",
+                price = 100.0,
+                quantity = 10,
+                imageUrl = "https://example.com/semantics.jpg",
+                productOptions = listOf(ProductOptionRequest("silver", 8, 6L)),
+            )
+
+        val createdProductResponse =
+            mockMvc.post("/api/admin/products") {
+                header("Authorization", "Bearer $adminToken")
+                contentType = MediaType.APPLICATION_JSON
+                content = objectMapper.writeValueAsString(originalProduct)
+            }.andExpect {
+                status { isCreated() }
+            }.andReturn()
+
+        val productId =
+            objectMapper.readTree(createdProductResponse.response.contentAsString)
+                .get("id").asLong()
+
+        val completeUpdateRequest =
+            UpdateProductRequest(
+                name = "UpdatedName",
+                price = 200.0,
+                quantity = 20,
+                imageUrl = "https://example.com/complete.jpg",
+            )
+
+        mockMvc.put("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(completeUpdateRequest)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.name") { value("UpdatedName") }
+            jsonPath("$.price") { value(200.0) }
+            jsonPath("$.quantity") { value(20) }
+            jsonPath("$.imageUrl") { value("https://example.com/complete.jpg") }
+        }
+
+        val partialPatchRequest = ProductPatchRequest(price = 250.0)
+
+        mockMvc.patch("/api/admin/products/$productId") {
+            header("Authorization", "Bearer $adminToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(partialPatchRequest)
+        }.andExpect {
+            status { isOk() }
+            jsonPath("$.name") { value("UpdatedName") }
+            jsonPath("$.price") { value(250.0) }
+            jsonPath("$.quantity") { value(20) }
+            jsonPath("$.imageUrl") { value("https://example.com/complete.jpg") }
         }
     }
 }
