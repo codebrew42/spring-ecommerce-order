@@ -1,7 +1,8 @@
 package ecommerce.controller
 
+import ecommerce.dto.CreateProductRequest
 import ecommerce.dto.ProductOptionRequest
-import ecommerce.dto.ProductRequest
+import ecommerce.dto.UpdateProductRequest
 import ecommerce.model.Product
 import ecommerce.model.ProductOption
 import ecommerce.service.ProductOptionService
@@ -37,7 +38,7 @@ class AdminController(private val productService: ProductService, private val pr
 
     @PostMapping("")
     fun createProduct(
-        @Valid @RequestBody productRequest: ProductRequest,
+        @Valid @RequestBody productRequest: CreateProductRequest,
     ): ResponseEntity<Product> {
         val saved = productService.createProduct(productRequest)
         return ResponseEntity.created(URI.create("/api/products/${saved.id}")).body(saved)
@@ -45,7 +46,7 @@ class AdminController(private val productService: ProductService, private val pr
 
     @PutMapping("/{id}")
     fun updateProduct(
-        @Valid @RequestBody productRequest: ProductRequest,
+        @Valid @RequestBody productRequest: UpdateProductRequest,
         @PathVariable id: Long,
     ): ResponseEntity<Product> {
         val updated = productService.updateProduct(id, productRequest)

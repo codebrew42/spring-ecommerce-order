@@ -1,6 +1,7 @@
 package ecommerce.controller
 
-import ecommerce.dto.ProductRequest
+import ecommerce.dto.CreateProductRequest
+import ecommerce.dto.UpdateProductRequest
 import ecommerce.model.Product
 import ecommerce.service.ProductService
 import jakarta.validation.Valid
@@ -35,7 +36,7 @@ class ProductController(private val productService: ProductService) {
 
     @PostMapping()
     fun createProduct(
-        @Valid @RequestBody productRequest: ProductRequest,
+        @Valid @RequestBody productRequest: CreateProductRequest,
     ): ResponseEntity<Product> {
         val saved = productService.createProduct(productRequest)
         return ResponseEntity.created(URI.create("/api/products/${saved.id}")).body(saved)
@@ -43,7 +44,7 @@ class ProductController(private val productService: ProductService) {
 
     @PutMapping("/{id}")
     fun updateProduct(
-        @Valid @RequestBody productRequest: ProductRequest,
+        @Valid @RequestBody productRequest: UpdateProductRequest,
         @PathVariable id: Long,
     ): Product {
         return productService.updateProduct(id, productRequest)
@@ -51,7 +52,7 @@ class ProductController(private val productService: ProductService) {
 
     @PatchMapping("/{id}")
     fun updateProductPartially(
-        @Valid @RequestBody productRequest: ProductRequest,
+        @Valid @RequestBody productRequest: UpdateProductRequest,
         @PathVariable id: Long,
     ): Product {
         return productService.updateProduct(id, productRequest)

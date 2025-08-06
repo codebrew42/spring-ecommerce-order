@@ -1,8 +1,9 @@
 package ecommerce.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import ecommerce.dto.CreateProductRequest
 import ecommerce.dto.ProductOptionRequest
-import ecommerce.dto.ProductRequest
+import ecommerce.dto.UpdateProductRequest
 import ecommerce.model.Member
 import ecommerce.model.Product
 import ecommerce.model.Role
@@ -51,7 +52,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "New Product",
                 price = 99.99,
                 quantity = 10,
@@ -115,7 +116,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "New Product",
                 price = 149.99,
                 quantity = 5,
@@ -143,7 +144,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val invalidProductRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "",
                 price = -10.0,
                 quantity = 0,
@@ -165,7 +166,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val originalProduct =
-            ProductRequest(
+            CreateProductRequest(
                 name = "OriginalProduct",
                 price = 99.99,
                 quantity = 10,
@@ -187,12 +188,11 @@ class AdminControllerTest {
                 .get("id").asLong()
 
         val updatedProduct =
-            ProductRequest(
+            UpdateProductRequest(
                 name = "Updated Product",
                 price = 199.99,
                 quantity = 20,
                 imageUrl = "https://example.com",
-                productOptions = listOf(ProductOptionRequest("black", 20, 6L), ProductOptionRequest("Yellow", 10, 6L)),
             )
 
         mockMvc.put("/api/admin/products/$productId") {
@@ -212,7 +212,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "DeleteProduct",
                 price = 99.99,
                 quantity = 10,
@@ -251,7 +251,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "ProductOptions",
                 price = 99.99,
                 quantity = 10,
@@ -303,7 +303,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "Test Product2",
                 price = 99.99,
                 quantity = 10,
@@ -413,7 +413,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "OptionUpdate",
                 price = 99.99,
                 quantity = 10,
@@ -478,7 +478,7 @@ class AdminControllerTest {
         val adminToken = createAdminToken()
 
         val productRequest =
-            ProductRequest(
+            CreateProductRequest(
                 name = "DuplicateTest",
                 price = 99.99,
                 quantity = 10,
