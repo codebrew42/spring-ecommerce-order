@@ -40,10 +40,6 @@ class ProductTest {
     }
 
     @Test
-    fun `throw exception - product option can not be empty`() {
-    }
-
-    @Test
     fun `throw exception - product name contains unsupported characters`() {
         assertThrows<IllegalArgumentException> {
             createTestProduct(name = "$")
