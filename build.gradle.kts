@@ -23,7 +23,6 @@ repositories {
 val assureVersion = "5.3.1"
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-//    implementation("org.springframework.boot:spring-boot-starter-jdbc") // TODO: Remove
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
@@ -38,7 +37,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("io.rest-assured:rest-assured:$assureVersion")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
 
 kotlin {
