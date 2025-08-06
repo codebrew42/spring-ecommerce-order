@@ -38,7 +38,7 @@ class TokenService(
                 .build()
                 .parseSignedClaims(token)
                 .payload
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }

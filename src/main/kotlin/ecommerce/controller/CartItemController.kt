@@ -1,6 +1,5 @@
 package ecommerce.controller
 
-import ecommerce.dto.auth.AuthenticatedUser
 import ecommerce.dto.cart.AddToCartRequest
 import ecommerce.model.CartItem
 import ecommerce.service.CartItemService
@@ -22,7 +21,6 @@ class CartItemController(
     fun addToCart(
         @PathVariable cartId: Long,
         @RequestBody request: AddToCartRequest,
-        user: AuthenticatedUser,
     ): ResponseEntity<CartItem> {
         val cartItem = cartItemService.saveCartItem(request, cartId)
         return ResponseEntity.ok(cartItem)
@@ -33,7 +31,6 @@ class CartItemController(
         @PathVariable itemId: Long,
         @PathVariable cartId: Long,
         @RequestBody request: AddToCartRequest,
-        user: AuthenticatedUser,
     ): ResponseEntity<CartItem> {
         val updatedItem = cartItemService.saveCartItem(request, itemId, cartId)
         return ResponseEntity.ok(updatedItem)

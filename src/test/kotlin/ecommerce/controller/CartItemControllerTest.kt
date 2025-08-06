@@ -1,8 +1,6 @@
 package ecommerce.controller
 
-import ecommerce.dto.auth.AuthenticatedUser
 import ecommerce.dto.cart.AddToCartRequest
-import ecommerce.model.Role
 import ecommerce.repository.CartItemRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -36,7 +34,6 @@ class CartItemControllerTest {
                 1,
                 1,
                 addToCartRequest,
-                AuthenticatedUser(1, Role.USER, "test@example.com", "Test User"),
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -56,7 +53,6 @@ class CartItemControllerTest {
             cartItemController.addToCart(
                 1,
                 addToCartRequest,
-                AuthenticatedUser(1, Role.USER, "test@example.com", "Test User"),
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
@@ -77,7 +73,6 @@ class CartItemControllerTest {
             cartItemController.addToCart(
                 1,
                 addToCartRequest,
-                AuthenticatedUser(1, Role.USER, "test@example.com", "Test User"),
             )
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
