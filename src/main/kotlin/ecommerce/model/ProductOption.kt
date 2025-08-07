@@ -17,7 +17,7 @@ class ProductOption(
     var name: String,
     @Column(name = "quantity", nullable = false)
     var quantity: Int,
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
     @Id
