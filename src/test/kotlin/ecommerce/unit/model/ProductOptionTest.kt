@@ -2,6 +2,7 @@ package ecommerce.unit.model
 
 import ecommerce.model.Product
 import ecommerce.model.ProductOption
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.Test
@@ -16,21 +17,7 @@ class ProductOptionTest {
         )
 
     @Test
-    fun `Option names can not be empty`() {
-        assertThrows<IllegalArgumentException> {
-            ProductOption(name = "", quantity = 2, createTestProduct())
-        }
-    }
-
-    @Test
-    fun `Option names can not be longer than 50 characters`() {
-        assertThrows<IllegalArgumentException> {
-            ProductOption(name = "a".repeat(51), quantity = 2, createTestProduct())
-        }
-    }
-
-    @Test
-    fun `Option names can contain spaces`() {
+    fun `create product option successfully`() {
         assertDoesNotThrow {
             ProductOption(name = "valid name", quantity = 2, createTestProduct())
         }

@@ -22,17 +22,6 @@ class Product(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    init {
-        require(name.isNotEmpty() && name.length <= MAX_NAME_LENGTH)
-        require(name.all { it.isLetterOrDigit() || it in ALLOWED_SPECIAL_CHAR }) { "Name contains invalid characters" }
-        require(imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))
-    }
-
-    companion object {
-        private const val MAX_NAME_LENGTH = 15
-        private const val ALLOWED_SPECIAL_CHAR = "()[]+-&/_ "
-    }
-
     override fun toString(): String {
         return "Product(id=$id, name=$name, price=$price quantity=$quantity)"
     }
