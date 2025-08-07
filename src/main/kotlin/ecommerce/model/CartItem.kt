@@ -66,6 +66,6 @@ class CartItem(
     }
 
     override fun toString(): String {
-        return "Cart Item(id=$id, productOption=$productOption, quantity=$quantity)"
+        return "CartItem(id=$id, cartId=${cart.id}, productOptionId=${productOption.id}, quantity=$quantity)"
     }
 }

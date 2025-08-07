@@ -41,6 +41,6 @@ class Member(
     )
 
     override fun toString(): String {
-        return "Member(id=$id, email=$email, name=$name, role=$role, cart=$cart)"
+        return "Member(id=$id, email=$email, name=$name, role=$role, cartId=${cart?.id})"
     }
 }

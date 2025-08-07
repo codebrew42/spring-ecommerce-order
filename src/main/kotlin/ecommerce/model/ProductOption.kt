@@ -31,6 +31,6 @@ class ProductOption(
     }
 
     override fun toString(): String {
-        return "Product Option(id=$id, name=$name, quantity=$quantity, product=$product)"
+        return "ProductOption(id=$id, name=$name, quantity=$quantity, productId=${product.id})"
     }
 }
