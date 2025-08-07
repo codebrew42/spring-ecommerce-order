@@ -7,6 +7,7 @@ import ecommerce.exception.ErrorResponse
 import ecommerce.exception.InsufficientProductOptionsException
 import ecommerce.exception.NotFoundException
 import ecommerce.exception.ProductValidationException
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -14,6 +15,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class GlobalControllerAdvice {
+    private val log = LoggerFactory.getLogger(GlobalControllerAdvice::class.java)
+
+    @ExceptionHandler(RuntimeException::class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun handleGenericException(e: RuntimeException): ErrorResponse {
+        log.error("Unhandled exception occurred", e)
+
+        return ErrorResponse(
+            error = "INTERNAL_SERVER_ERROR",
+            message = "An unexpected error occurred. Please try again later.",
+        )
+    }
+
     @ExceptionHandler(NotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun handleNotFoundException(e: NotFoundException): ErrorResponse {

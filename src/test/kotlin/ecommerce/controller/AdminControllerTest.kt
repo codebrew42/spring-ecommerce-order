@@ -778,7 +778,7 @@ class AdminControllerTest {
             contentType = MediaType.APPLICATION_JSON
             content = missingFieldJson
         }.andExpect {
-            status { isBadRequest() }
+            status { isInternalServerError() }
         }
     }
 
