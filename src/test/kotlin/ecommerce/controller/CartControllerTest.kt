@@ -7,7 +7,7 @@ import ecommerce.model.Member
 import ecommerce.model.Role
 import ecommerce.service.CartItemService
 import ecommerce.service.CartService
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -42,8 +42,8 @@ class CartControllerTest {
 
         val response = cartController.getCart(userId)
 
-        assertEquals(testCart, response)
-        assertEquals(userId, response.member?.id)
+        assertThat(response).isEqualTo(testCart)
+        assertThat(response.member?.id).isEqualTo(userId)
         verify(cartService, times(1)).getCartByUserId(userId)
     }
 
@@ -72,7 +72,7 @@ class CartControllerTest {
                 AuthenticatedUser(userId, Role.USER, "test@email.com", "Test User"),
             )
 
-        assertEquals(emptyList, result)
+        assertThat(result).isEqualTo(emptyList)
         verify(cartService, times(1)).getCartItemsOfCartByCartId(cartId, userId)
     }
 }

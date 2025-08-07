@@ -3,7 +3,7 @@ package ecommerce.controller
 import ecommerce.model.Product
 import ecommerce.service.ProductOptionService
 import ecommerce.service.ProductService
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,7 +39,7 @@ class AdminControllerUnitTest {
 
         val result = adminController.getProductById(productId)
 
-        assertEquals(expectedProduct, result)
+        assertThat(result).isEqualTo(expectedProduct)
         verify(productService, times(1)).findProductById(productId)
     }
 
@@ -67,8 +67,8 @@ class AdminControllerUnitTest {
 
         val result = adminController.getAllProducts(0, 10, "name")
 
-        assertEquals(page, result)
-        assertEquals(2, result.content.size)
+        assertThat(result).isEqualTo(page)
+        assertThat(result.content.size).isEqualTo(2)
         verify(productService, times(1)).findAllProducts(0, 10, "name")
     }
 }
