@@ -48,6 +48,6 @@ class Cart(
     )
 
     override fun toString(): String {
-        return "Cart(id=$id, member=$member, cartItem=$cartItem, quantity=$quantity)"
+        return "Cart(id=$id, memberId=${member?.id}, cartItemCount=${cartItem.size}, quantity=$quantity)"
     }
 }
