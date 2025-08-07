@@ -101,7 +101,7 @@ class MemberControllerIntegrationTest {
     fun `should return 200 - valid token of ADMIN member`() {
         val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.ADMIN, null, 1L)
         val validToken = tokenService.generateToken(testMember)
-        mockMvc.get("/admin") {
+        mockMvc.get("/api/admin/products") {
             header("Authorization", "Bearer $validToken")
         }.andExpect {
             status { isOk() }
@@ -110,9 +110,9 @@ class MemberControllerIntegrationTest {
 
     @Test
     fun `should return 200 - USER can access cart`() {
-        val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.USER, null, 2L)
+        val testMember = Member("jin@gmail.com", "pw1234", "jin", Role.USER, null, 1L)
         val validToken = tokenService.generateToken(testMember)
-        mockMvc.get("/api/cart-items") {
+        mockMvc.get("/api/carts/1/items") {
             header("Authorization", "Bearer $validToken")
         }.andExpect {
             status { isOk() }
@@ -121,7 +121,7 @@ class MemberControllerIntegrationTest {
 
     @Test
     fun `should return 401 - invalid token`() {
-        mockMvc.get("/admin") {
+        mockMvc.get("/api/admin/products") {
             header("Authorization", "Bearer invalid-token")
         }.andExpect {
             status { isUnauthorized() }
@@ -130,7 +130,7 @@ class MemberControllerIntegrationTest {
 
     @Test
     fun `should return 401 - no token provided`() {
-        mockMvc.get("/admin").andExpect {
+        mockMvc.get("/api/admin/products").andExpect {
             status { isUnauthorized() }
         }
     }
@@ -139,7 +139,7 @@ class MemberControllerIntegrationTest {
     fun `should return 403 - USER role cannot access admin endpoint`() {
         val testMember = Member("user@gmail.com", "pw1234", "user", Role.USER, null, 3L)
         val validToken = tokenService.generateToken(testMember)
-        mockMvc.get("/admin") {
+        mockMvc.get("/api/admin/products") {
             header("Authorization", "Bearer $validToken")
         }.andExpect {
             status { isForbidden() }

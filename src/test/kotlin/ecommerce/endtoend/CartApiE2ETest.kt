@@ -48,7 +48,7 @@ class CartApiE2ETest {
                 .header("Authorization", "Bearer $token")
                 .contentType(ContentType.JSON)
                 .`when`()
-                .get("${getBaseUrl()}/api/cart-items")
+                .get("${getBaseUrl()}/api/carts/1/items")
                 .then()
                 .statusCode(200)
         } catch (e: Exception) {

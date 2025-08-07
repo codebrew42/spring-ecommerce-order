@@ -15,9 +15,9 @@ class WebMvcConfig(
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authInterceptor)
             .addPathPatterns("/api/cart/**")
+            .addPathPatterns("/api/carts/**")
             .addPathPatterns("/api/cart-items/**")
             .addPathPatterns("/api/admin/**")
-            .addPathPatterns("/admin/**")
     }
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {

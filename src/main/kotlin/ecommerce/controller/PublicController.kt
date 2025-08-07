@@ -7,7 +7,6 @@ import ecommerce.service.MemberService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -32,18 +31,5 @@ class PublicController(private val memberService: MemberService) {
         val token = memberService.authenticate(loginRequest.email, loginRequest.password)
         val tokenResponse = TokenResponse(token = token)
         return ResponseEntity.ok(tokenResponse)
-    }
-}
-
-@RestController
-class TestEndpointsController {
-    @GetMapping("/admin")
-    fun adminEndpoint(): ResponseEntity<Map<String, String>> {
-        return ResponseEntity.ok(mapOf("message" to "Admin access granted"))
-    }
-
-    @GetMapping("/api/cart-items")
-    fun cartItemsEndpoint(): ResponseEntity<Map<String, String>> {
-        return ResponseEntity.ok(mapOf("message" to "Cart access granted"))
     }
 }
