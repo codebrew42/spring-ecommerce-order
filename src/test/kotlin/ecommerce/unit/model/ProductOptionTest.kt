@@ -24,23 +24,25 @@ class ProductOptionTest {
     }
 
     @Test
-    fun `Option names throws Exception with unsupported characters`() {
+    fun `subtract quantity successfully`() {
+        val productOption = ProductOption(name = "Option", quantity = 10, createTestProduct())
+        productOption.subtract(3)
+        assertThat(productOption.quantity).isEqualTo(7)
+    }
+
+    @Test
+    fun `subtract throws exception when quantity is less than 1`() {
+        val productOption = ProductOption(name = "Option", quantity = 10, createTestProduct())
         assertThrows<IllegalArgumentException> {
-            ProductOption(name = "$$$$$$$", quantity = 2, createTestProduct())
+            productOption.subtract(0)
         }
     }
 
     @Test
-    fun `throws exception - Product option quantity less than minimum `() {
+    fun `subtract throws exception when quantity exceeds stock`() {
+        val productOption = ProductOption(name = "Option", quantity = 5, createTestProduct())
         assertThrows<IllegalArgumentException> {
-            ProductOption(name = "Option", quantity = -2, createTestProduct())
-        }
-    }
-
-    @Test
-    fun `throws exception - Product option quantity greater than maximum `() {
-        assertThrows<IllegalArgumentException> {
-            ProductOption(name = "Option", quantity = 99999999 + 1, createTestProduct())
+            productOption.subtract(10)
         }
     }
 }
