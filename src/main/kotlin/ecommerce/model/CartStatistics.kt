@@ -7,13 +7,21 @@ import jakarta.persistence.ForeignKey
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "cart_statistics")
+@Table(
+    name = "cart_statistics",
+    indexes = [
+        Index(name = "idx_cart_statistics_cart_id", columnList = "cart_id"),
+        Index(name = "idx_cart_statistics_product_option_id", columnList = "product_option_id"),
+        Index(name = "idx_cart_statistics_added_at", columnList = "added_at")
+    ]
+)
 class CartStatistics(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
