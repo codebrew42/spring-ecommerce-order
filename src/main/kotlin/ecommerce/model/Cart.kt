@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.BatchSize
 import java.time.LocalDateTime
 
 @Entity
@@ -21,6 +22,7 @@ class Cart(
     @JoinColumn(name = "member_id", nullable = true)
     val member: Member? = null,
     @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @BatchSize(size = 20)
     @JsonIgnore
     val cartItem: MutableList<CartItem> = mutableListOf(),
     @Column(name = "quantity", nullable = false)
