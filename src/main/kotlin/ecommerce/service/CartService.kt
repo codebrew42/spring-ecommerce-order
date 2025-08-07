@@ -8,8 +8,8 @@ import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.ProductOptionRepository
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrNull
 
@@ -20,11 +20,13 @@ class CartService(
     private val productOptionRepository: ProductOptionRepository,
     private val memberRepository: MemberRepository,
 ) {
+    @Transactional(readOnly = true)
     fun getCartByUserId(userId: Long): Cart {
         return cartRepository.findByMemberId(userId)
             ?: throw NotFoundException("Cart not found for user $userId")
     }
 
+    @Transactional(readOnly = true)
     fun getCartByIdAndUserId(
         cartId: Long,
         userId: Long,
@@ -33,6 +35,7 @@ class CartService(
             ?: throw NotFoundException("Cart not found or access denied")
     }
 
+    @Transactional(readOnly = true)
     fun getCartItemsOfCartByCartId(
         cartId: Long,
         userId: Long,
