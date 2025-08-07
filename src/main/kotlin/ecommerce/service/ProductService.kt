@@ -90,7 +90,7 @@ class ProductService(
     }
 
     fun deleteById(id: Long) {
-        productOptionRepository.deleteProductOptionsByProductId(id)
+        productOptionRepository.deleteByProductId(id)
         productRepository.deleteById(id)
     }
 }

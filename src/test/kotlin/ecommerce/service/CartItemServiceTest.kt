@@ -168,7 +168,7 @@ class CartItemServiceTest {
         cartItemService.deleteAllCartItemsByCartId(cartId)
 
         verify(cartRepository).findById(cartId)
-        verify(cartItemRepository).deleteAllByCartId(cartId)
+        verify(cartItemRepository).deleteByCartId(cartId)
     }
 
     @Test

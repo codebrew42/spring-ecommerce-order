@@ -129,6 +129,6 @@ class CartItemService(
     fun deleteAllCartItemsByCartId(cartId: Long) {
         cartRepository.findById(cartId).getOrNull()
             ?: throw NotFoundException("Cart not found")
-        cartItemRepository.deleteAllByCartId(cartId)
+        cartItemRepository.deleteByCartId(cartId)
     }
 }
