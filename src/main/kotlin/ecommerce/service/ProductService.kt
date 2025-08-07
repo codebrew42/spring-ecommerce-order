@@ -38,19 +38,29 @@ class ProductService(
 
     @Transactional
     fun createProduct(request: CreateProductRequest): Product {
-        if (productRepository.existsByName(request.name)) {
-            throw DuplicateNameException("Product name already exists")
-        }
         if (request.productOptions.isEmpty()) {
             throw InsufficientProductOptionsException("Product needs at least one option")
         }
+
+        if (productRepository.existsByName(request.name)) {
+            throw DuplicateNameException("Product name already exists")
+        }
+
         val product = request.toModel()
         val savedProduct = productRepository.save(product)
 
-        request.productOptions.forEach { option ->
-            option.productId = savedProduct.id!!
-            productOptionRepository.save(ProductOption(option.name, option.quantity, product))
+        val productOptions =
+            request.productOptions.map { option ->
+                option.productId = savedProduct.id!!
+                ProductOption(option.name, option.quantity, savedProduct)
+            }
+
+        try {
+            productOptionRepository.saveAll(productOptions)
+        } catch (e: Exception) {
+            throw IllegalStateException("Failed to create product options: ${e.message}", e)
         }
+
         return savedProduct
     }
 
