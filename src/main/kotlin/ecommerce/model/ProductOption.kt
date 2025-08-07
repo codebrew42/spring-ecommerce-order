@@ -15,8 +15,8 @@ import jakarta.persistence.Table
 @Table(
     name = "product_options",
     indexes = [
-        Index(name = "idx_product_option_product_id", columnList = "product_id")
-    ]
+        Index(name = "idx_product_option_product_id", columnList = "product_id"),
+    ],
 )
 class ProductOption(
     @Column(name = "name", nullable = false)

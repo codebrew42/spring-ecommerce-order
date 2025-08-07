@@ -17,8 +17,8 @@ import jakarta.persistence.Table
 @Table(
     name = "members",
     indexes = [
-        Index(name = "idx_member_email", columnList = "email")
-    ]
+        Index(name = "idx_member_email", columnList = "email"),
+    ],
 )
 class Member(
     @Column(name = "email", nullable = false, unique = true)

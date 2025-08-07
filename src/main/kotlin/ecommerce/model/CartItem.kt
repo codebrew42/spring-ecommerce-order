@@ -19,8 +19,8 @@ import java.util.Objects
     name = "cart_items",
     indexes = [
         Index(name = "idx_cart_item_cart_id", columnList = "cart_id"),
-        Index(name = "idx_cart_item_product_option_id", columnList = "product_option_id")
-    ]
+        Index(name = "idx_cart_item_product_option_id", columnList = "product_option_id"),
+    ],
 )
 class CartItem(
     @ManyToOne(fetch = FetchType.LAZY)

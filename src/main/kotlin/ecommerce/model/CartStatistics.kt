@@ -19,8 +19,8 @@ import java.time.LocalDateTime
     indexes = [
         Index(name = "idx_cart_statistics_cart_id", columnList = "cart_id"),
         Index(name = "idx_cart_statistics_product_option_id", columnList = "product_option_id"),
-        Index(name = "idx_cart_statistics_added_at", columnList = "added_at")
-    ]
+        Index(name = "idx_cart_statistics_added_at", columnList = "added_at"),
+    ],
 )
 class CartStatistics(
     @ManyToOne(fetch = FetchType.LAZY)

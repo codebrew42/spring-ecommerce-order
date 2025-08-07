@@ -20,8 +20,8 @@ import java.time.LocalDateTime
 @Table(
     name = "carts",
     indexes = [
-        Index(name = "idx_cart_member_id", columnList = "member_id")
-    ]
+        Index(name = "idx_cart_member_id", columnList = "member_id"),
+    ],
 )
 class Cart(
     @OneToOne(fetch = FetchType.LAZY)
