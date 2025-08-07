@@ -69,6 +69,7 @@ class CartItemService(
                 existingCartItem.quantity + request.newProductOptionQuantity
             }
 
+        validateCartItemQuantity(newQuantity, productOption)
         existingCartItem.modify(null, null, newQuantity, LocalDateTime.now())
         return cartItemRepository.save(existingCartItem)
     }
@@ -77,14 +78,18 @@ class CartItemService(
         cart: ecommerce.model.Cart,
         productOption: ecommerce.model.ProductOption,
         request: AddToCartRequest,
-    ) = cartItemRepository.save(
-        CartItem(
-            cart = cart,
-            productOption = productOption,
-            quantity = request.newProductOptionQuantity,
-            itemAddedAt = LocalDateTime.now(),
-        ),
-    )
+    ): CartItem {
+        validateCartItemQuantity(request.newProductOptionQuantity, productOption)
+
+        return cartItemRepository.save(
+            CartItem(
+                cart = cart,
+                productOption = productOption,
+                quantity = request.newProductOptionQuantity,
+                itemAddedAt = LocalDateTime.now(),
+            ),
+        )
+    }
 
     private fun validateQuantityIncrement(
         request: AddToCartRequest,
@@ -96,6 +101,27 @@ class CartItemService(
                     "must be greater than current quantity (${productOption.quantity})",
             )
         }
+    }
+
+    private fun validateCartItemQuantity(
+        requestedQuantity: Int,
+        @Suppress("UNUSED_PARAMETER") productOption: ecommerce.model.ProductOption,
+    ) {
+        if (requestedQuantity <= 0) {
+            throw IllegalArgumentException("Cart item quantity must be greater than 0")
+        }
+
+        if (requestedQuantity > 999) {
+            throw IllegalArgumentException("Maximum quantity per item is 999")
+        }
+
+        // Note: Stock validation removed to allow business flexibility
+        // This must be handled at checkout time LATER
+        // if (requestedQuantity > productOption.quantity) {
+        //     throw IllegalArgumentException(
+        //         "Requested quantity ($requestedQuantity) exceeds available stock (${productOption.quantity})"
+        //     )
+        // }
     }
 
     private fun updateProductOptionQuantity(
