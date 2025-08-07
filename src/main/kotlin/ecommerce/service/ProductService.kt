@@ -44,7 +44,7 @@ class ProductService(
         if (request.productOptions.isEmpty()) {
             throw InsufficientProductOptionsException("Product needs at least one option")
         }
-        var product = request.toModel()
+        val product = request.toModel()
         val savedProduct = productRepository.save(product)
 
         request.productOptions.forEach { option ->
