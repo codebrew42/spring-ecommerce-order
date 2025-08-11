@@ -27,7 +27,7 @@ class Cart(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = true)
     val member: Member? = null,
-    @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     @BatchSize(size = 20)
     @JsonIgnore
     val cartItem: MutableList<CartItem> = mutableListOf(),
