@@ -1,38 +1,22 @@
 package ecommerce.service
 
-import ecommerce.dto.cart.AddToCartRequest
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Cart
 import ecommerce.model.CartItem
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
-import ecommerce.repository.MemberRepository
-import ecommerce.repository.ProductOptionRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class CartService(
     private val cartRepository: CartRepository,
     private val cartItemRepository: CartItemRepository,
-    private val productOptionRepository: ProductOptionRepository,
-    private val memberRepository: MemberRepository,
 ) {
     @Transactional(readOnly = true)
     fun getCartByUserId(userId: Long): Cart {
         return cartRepository.findByMemberId(userId)
             ?: throw NotFoundException("Cart not found for user $userId")
-    }
-
-    @Transactional(readOnly = true)
-    fun getCartByIdAndUserId(
-        cartId: Long,
-        userId: Long,
-    ): Cart {
-        return cartRepository.findByIdAndMemberId(cartId, userId)
-            ?: throw NotFoundException("Cart not found or access denied")
     }
 
     @Transactional(readOnly = true)
@@ -46,50 +30,7 @@ class CartService(
     }
 
     @Transactional
-    fun addToCart(
-        userId: Long,
-        request: AddToCartRequest,
-    ): Cart {
-        productOptionRepository.findById(request.productOptionId).getOrNull()
-            ?: throw NotFoundException("Product option not found")
-        val existingCart = cartRepository.findByMemberIdAndCartItemProductOptionId(userId, request.productOptionId)
-        return if (existingCart != null) {
-            existingCart.addQuantity(request.newProductOptionQuantity)
-            existingCart
-        } else {
-            val member =
-                memberRepository.findById(userId).getOrNull()
-                    ?: throw NotFoundException("Member not found")
-            val newCart =
-                Cart(
-                    member = member,
-                    cartItem = mutableListOf(),
-                    quantity = request.newProductOptionQuantity,
-                    newItemAddedAt = LocalDateTime.now(),
-                )
-            cartRepository.save(newCart)
-        }
-    }
-
-    @Transactional
     fun clearCart(userId: Long) {
         cartRepository.deleteByMemberId(userId)
-    }
-
-    @Transactional
-    fun updateQuantity(
-        userId: Long,
-        productOptionId: Long,
-        request: ecommerce.dto.cart.UpdateQuantityRequest,
-    ): Cart {
-        productOptionRepository.findById(productOptionId).getOrNull()
-            ?: throw NotFoundException("Product option not found")
-
-        val existingCart =
-            cartRepository.findByMemberIdAndCartItemProductOptionId(userId, productOptionId)
-                ?: throw NotFoundException("Item not found in cart")
-
-        existingCart.updateQuantity(request.quantity)
-        return existingCart
     }
 }
