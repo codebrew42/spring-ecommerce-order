@@ -72,7 +72,7 @@ class CartItemService(
 
         CartItem.validateQuantity(newQuantity)
         existingCartItem.modify(null, null, newQuantity, LocalDateTime.now())
-        return cartItemRepository.save(existingCartItem)
+        return existingCartItem
     }
 
     private fun createNewCartItem(

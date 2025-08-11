@@ -11,12 +11,14 @@ import ecommerce.model.Role
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
 import ecommerce.repository.ProductOptionRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.any
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
@@ -85,12 +87,12 @@ class CartItemServiceTest {
         `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
         `when`(productOptionRepository.findById(request.productOptionId)).thenReturn(Optional.of(testProductOption))
         `when`(cartItemRepository.findByCartAndProductOption(testCart, testProductOption)).thenReturn(existingCartItem)
-        `when`(cartItemRepository.save(any(CartItem::class.java))).thenReturn(existingCartItem)
 
         val result = cartItemService.saveCartItem(request, cartId)
 
         assertNotNull(result)
-        verify(cartItemRepository).save(any(CartItem::class.java))
+        verify(cartItemRepository, never()).save(any(CartItem::class.java))
+        assertThat(result.quantity).isEqualTo(5) // 2+3
     }
 
     @Test
