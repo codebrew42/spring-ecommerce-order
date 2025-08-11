@@ -114,14 +114,6 @@ class CartItemService(
         if (requestedQuantity > 999) {
             throw IllegalArgumentException("Maximum quantity per item is 999")
         }
-
-        // Note: Stock validation removed to allow business flexibility
-        // This must be handled at checkout time LATER
-        // if (requestedQuantity > productOption.quantity) {
-        //     throw IllegalArgumentException(
-        //         "Requested quantity ($requestedQuantity) exceeds available stock (${productOption.quantity})"
-        //     )
-        // }
     }
 
     private fun updateProductOptionQuantity(
