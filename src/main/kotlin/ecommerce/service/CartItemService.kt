@@ -58,8 +58,9 @@ class CartItemService(
     ): CartItem {
         if (isDirectUpdate) {
             productOption.checkQuantityIncrement(request.newProductOptionQuantity)
-            updateProductOptionQuantity(productOption, request)
-            updateCartQuantity(cart, request)
+            productOption.updateQuantity(request.newProductOptionQuantity)
+            productOptionRepository.save(productOption)
+            cart.addQuantity(request.newProductOptionQuantity)
         }
 
         val newQuantity =
@@ -89,21 +90,6 @@ class CartItemService(
                 itemAddedAt = LocalDateTime.now(),
             ),
         )
-    }
-
-    private fun updateProductOptionQuantity(
-        productOption: ecommerce.model.ProductOption,
-        request: AddToCartRequest,
-    ) {
-        productOption.updateQuantity(request.newProductOptionQuantity)
-        productOptionRepository.save(productOption)
-    }
-
-    private fun updateCartQuantity(
-        cart: ecommerce.model.Cart,
-        request: AddToCartRequest,
-    ) {
-        cart.addQuantity(request.newProductOptionQuantity)
     }
 
     @Transactional
