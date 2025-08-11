@@ -56,6 +56,7 @@ class MemberService(
             ?: throw NotFoundException("Member with id $id not found")
     }
 
+    @Transactional
     fun updateMemberById(
         id: Long,
         updateRequest: UpdateRequest,
@@ -69,9 +70,7 @@ class MemberService(
         ) {
             throw IllegalArgumentException("Email already exists")
         }
-
         existingMember.updateProfile(updateRequest.email, updateRequest.name)
-        memberRepository.save(existingMember)
     }
 
     fun deleteMemberById(id: Long) {

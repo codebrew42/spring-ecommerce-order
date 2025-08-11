@@ -55,7 +55,7 @@ class CartService(
         val existingCart = cartRepository.findByMemberIdAndCartItemProductOptionId(userId, request.productOptionId)
         return if (existingCart != null) {
             existingCart.addQuantity(request.newProductOptionQuantity)
-            cartRepository.save(existingCart)
+            existingCart
         } else {
             val member =
                 memberRepository.findById(userId).getOrNull()
@@ -90,6 +90,6 @@ class CartService(
                 ?: throw NotFoundException("Item not found in cart")
 
         existingCart.updateQuantity(request.quantity)
-        return cartRepository.save(existingCart)
+        return existingCart
     }
 }

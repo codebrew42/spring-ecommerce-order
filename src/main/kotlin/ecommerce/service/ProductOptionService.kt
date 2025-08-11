@@ -29,7 +29,7 @@ class ProductOptionService(
 
         if (existingOption != null) {
             existingOption.updateProductOption(request.name, request.quantity, product)
-            return productOptionRepository.save(existingOption)
+            return existingOption
         } else {
             if (productOptionRepository.existsByName(request.name)) {
                 throw DuplicateNameException("Product option name in this product already exists")
