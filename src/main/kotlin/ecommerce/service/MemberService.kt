@@ -31,9 +31,8 @@ class MemberService(
         val hashedPassword = passwordService.hashPassword(request.password)
         val member = request.toModel(hashedPassword)
 
-        member.cart = cartRepository.save(Cart())
-
         val savedMember = memberRepository.save(member)
+        cartRepository.save(Cart(member = savedMember))
         return tokenService.generateToken(savedMember)
     }
 
@@ -70,7 +69,6 @@ class MemberService(
                 password = existingMember.password,
                 name = updateRequest.name,
                 role = existingMember.role,
-                cart = existingMember.cart,
                 id = existingMember.id,
             )
         memberRepository.save(memberToUpdate)
