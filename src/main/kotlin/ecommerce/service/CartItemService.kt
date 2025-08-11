@@ -95,7 +95,7 @@ class CartItemService(
         productOption: ecommerce.model.ProductOption,
         request: AddToCartRequest,
     ) {
-        productOption.quantity = request.newProductOptionQuantity
+        productOption.updateQuantity(request.newProductOptionQuantity)
         productOptionRepository.save(productOption)
     }
 
@@ -103,7 +103,7 @@ class CartItemService(
         cart: ecommerce.model.Cart,
         request: AddToCartRequest,
     ) {
-        cart.quantity += request.newProductOptionQuantity
+        cart.addQuantity(request.newProductOptionQuantity)
     }
 
     @Transactional

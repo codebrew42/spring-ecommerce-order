@@ -33,6 +33,30 @@ class Product(
         return id?.hashCode() ?: 0
     }
 
+    fun updateProduct(
+        newName: String,
+        newPrice: Double,
+        newQuantity: Int,
+        newImageUrl: String,
+    ) {
+        this.name = newName
+        this.price = newPrice
+        this.quantity = newQuantity
+        this.imageUrl = newImageUrl
+    }
+
+    fun patchUpdate(
+        newName: String? = null,
+        newPrice: Double? = null,
+        newQuantity: Int? = null,
+        newImageUrl: String? = null,
+    ) {
+        newName?.let { this.name = it }
+        newPrice?.let { this.price = it }
+        newQuantity?.let { this.quantity = it }
+        newImageUrl?.let { this.imageUrl = it }
+    }
+
     override fun toString(): String {
         return "Product(id=$id, name=$name, price=$price quantity=$quantity)"
     }

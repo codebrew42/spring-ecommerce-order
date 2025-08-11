@@ -54,15 +54,8 @@ class CartService(
             ?: throw NotFoundException("Product option not found")
         val existingCart = cartRepository.findByMemberIdAndCartItemProductOptionId(userId, request.productOptionId)
         return if (existingCart != null) {
-            val updatedCart =
-                Cart(
-                    member = existingCart.member,
-                    cartItem = existingCart.cartItem,
-                    quantity = existingCart.quantity + request.newProductOptionQuantity,
-                    newItemAddedAt = LocalDateTime.now(),
-                    id = existingCart.id,
-                )
-            cartRepository.save(updatedCart)
+            existingCart.addQuantity(request.newProductOptionQuantity)
+            cartRepository.save(existingCart)
         } else {
             val member =
                 memberRepository.findById(userId).getOrNull()
@@ -96,14 +89,7 @@ class CartService(
             cartRepository.findByMemberIdAndCartItemProductOptionId(userId, productOptionId)
                 ?: throw NotFoundException("Item not found in cart")
 
-        val updatedCart =
-            Cart(
-                member = existingCart.member,
-                cartItem = existingCart.cartItem,
-                quantity = request.quantity,
-                newItemAddedAt = LocalDateTime.now(),
-                id = existingCart.id,
-            )
-        return cartRepository.save(updatedCart)
+        existingCart.updateQuantity(request.quantity)
+        return cartRepository.save(existingCart)
     }
 }

@@ -34,7 +34,7 @@ class Cart(
     @Column(name = "quantity", nullable = false)
     var quantity: Int = 0,
     @Column(name = "updated_at", nullable = false)
-    val newItemAddedAt: LocalDateTime = LocalDateTime.now(),
+    var newItemAddedAt: LocalDateTime = LocalDateTime.now(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -52,6 +52,20 @@ class Cart(
         quantity = 0,
         newItemAddedAt = LocalDateTime.now(),
     )
+
+    fun addQuantity(additionalQuantity: Int) {
+        this.quantity += additionalQuantity
+        updateTimestamp()
+    }
+
+    fun updateTimestamp() {
+        this.newItemAddedAt = LocalDateTime.now()
+    }
+
+    fun updateQuantity(newQuantity: Int) {
+        this.quantity = newQuantity
+        updateTimestamp()
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

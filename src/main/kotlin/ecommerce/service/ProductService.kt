@@ -77,8 +77,8 @@ class ProductService(
             throw DuplicateNameException("Product name already exists")
         }
 
-        val updatedProduct = request.toModel(id)
-        return productRepository.save(updatedProduct)
+        existingProduct.updateProduct(request.name, request.price, request.quantity, request.imageUrl)
+        return productRepository.save(existingProduct)
     }
 
     @Transactional
@@ -95,8 +95,8 @@ class ProductService(
                 throw DuplicateNameException("Product name already exists")
             }
         }
-        val patchedProduct = request.toModel(id, existingProduct)
-        return productRepository.save(patchedProduct)
+        existingProduct.patchUpdate(request.name, request.price, request.quantity, request.imageUrl)
+        return productRepository.save(existingProduct)
     }
 
     fun deleteById(id: Long) {
