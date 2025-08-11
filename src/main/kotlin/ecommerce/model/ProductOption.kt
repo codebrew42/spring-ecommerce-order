@@ -10,6 +10,7 @@ import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import java.util.Objects
 
 @Entity
 @Table(
@@ -34,6 +35,21 @@ class ProductOption(
         if (quantity < 1) throw IllegalArgumentException("Quantity must be greater than 0")
         if (quantity > this.quantity) throw IllegalArgumentException("Quantity can not be greater than stock of product quantity")
         this.quantity -= quantity
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is ProductOption) return false
+
+        if (id != null && other.id != null) {
+            return id == other.id
+        }
+
+        return product == other.product && name == other.name
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(product.id, name)
     }
 
     override fun toString(): String {
