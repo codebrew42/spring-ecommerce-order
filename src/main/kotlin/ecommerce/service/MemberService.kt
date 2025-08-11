@@ -63,15 +63,15 @@ class MemberService(
         val existingMember =
             memberRepository.findByIdOrNull(id)
                 ?: throw NotFoundException("Member with id $id not found")
-        val memberToUpdate =
-            Member(
-                email = updateRequest.email,
-                password = existingMember.password,
-                name = updateRequest.name,
-                role = existingMember.role,
-                id = existingMember.id,
-            )
-        memberRepository.save(memberToUpdate)
+
+        if (updateRequest.email != existingMember.email &&
+            memberRepository.existsByEmail(updateRequest.email)
+        ) {
+            throw IllegalArgumentException("Email already exists")
+        }
+
+        existingMember.updateProfile(updateRequest.email, updateRequest.name)
+        memberRepository.save(existingMember)
     }
 
     fun deleteMemberById(id: Long) {

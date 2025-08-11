@@ -46,6 +46,20 @@ class ProductOption(
         }
     }
 
+    fun updateQuantity(newQuantity: Int) {
+        this.quantity = newQuantity
+    }
+
+    fun updateProductOption(
+        newName: String,
+        newQuantity: Int,
+        newProduct: Product,
+    ) {
+        this.name = newName
+        this.quantity = newQuantity
+        this.product = newProduct
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ProductOption) return false

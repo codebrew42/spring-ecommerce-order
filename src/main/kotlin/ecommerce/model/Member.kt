@@ -19,11 +19,11 @@ import jakarta.persistence.Table
 )
 class Member(
     @Column(name = "email", nullable = false, unique = true)
-    val email: String,
+    var email: String,
     @Column(name = "password", nullable = false)
     val password: String,
     @Column(name = "name", nullable = false)
-    val name: String,
+    var name: String,
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     val role: Role = Role.USER,
@@ -53,6 +53,14 @@ class Member(
 
     override fun hashCode(): Int {
         return email.hashCode()
+    }
+
+    fun updateProfile(
+        newEmail: String,
+        newName: String,
+    ) {
+        this.email = newEmail
+        this.name = newName
     }
 
     override fun toString(): String {

@@ -28,14 +28,8 @@ class ProductOptionService(
         val existingOption = productOptionId?.let { productOptionRepository.findById(it).orElse(null) }
 
         if (existingOption != null) {
-            val updatedOption =
-                ProductOption(
-                    id = productOptionId,
-                    name = request.name,
-                    quantity = request.quantity,
-                    product = product,
-                )
-            return productOptionRepository.save(updatedOption)
+            existingOption.updateProductOption(request.name, request.quantity, product)
+            return productOptionRepository.save(existingOption)
         } else {
             if (productOptionRepository.existsByName(request.name)) {
                 throw DuplicateNameException("Product option name in this product already exists")
