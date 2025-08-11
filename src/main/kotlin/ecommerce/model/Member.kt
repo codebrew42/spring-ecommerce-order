@@ -40,6 +40,21 @@ class Member(
         name = name,
     )
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Member) return false
+
+        if (id != null && other.id != null) {
+            return id == other.id
+        }
+
+        return email == other.email
+    }
+
+    override fun hashCode(): Int {
+        return email.hashCode()
+    }
+
     override fun toString(): String {
         return "Member(id=$id, email=$email, name=$name, role=$role)"
     }

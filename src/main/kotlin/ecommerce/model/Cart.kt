@@ -53,6 +53,21 @@ class Cart(
         newItemAddedAt = LocalDateTime.now(),
     )
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Cart) return false
+
+        if (id != null && other.id != null) {
+            return id == other.id
+        }
+
+        return member == other.member
+    }
+
+    override fun hashCode(): Int {
+        return member?.hashCode() ?: 0
+    }
+
     override fun toString(): String {
         return "Cart(id=$id, memberId=${member?.id}, cartItemCount=${cartItem.size}, quantity=$quantity)"
     }
