@@ -57,7 +57,7 @@ class CartItemService(
         isDirectUpdate: Boolean,
     ): CartItem {
         if (isDirectUpdate) {
-            validateQuantityIncrement(request, productOption)
+            productOption.checkQuantityIncrement(request.newProductOptionQuantity)
             updateProductOptionQuantity(productOption, request)
             updateCartQuantity(cart, request)
         }
@@ -69,7 +69,7 @@ class CartItemService(
                 existingCartItem.quantity + request.newProductOptionQuantity
             }
 
-        validateCartItemQuantity(newQuantity, productOption)
+        CartItem.validateQuantity(newQuantity)
         existingCartItem.modify(null, null, newQuantity, LocalDateTime.now())
         return cartItemRepository.save(existingCartItem)
     }
@@ -79,7 +79,7 @@ class CartItemService(
         productOption: ecommerce.model.ProductOption,
         request: AddToCartRequest,
     ): CartItem {
-        validateCartItemQuantity(request.newProductOptionQuantity, productOption)
+        CartItem.validateQuantity(request.newProductOptionQuantity)
 
         return cartItemRepository.save(
             CartItem(
@@ -89,31 +89,6 @@ class CartItemService(
                 itemAddedAt = LocalDateTime.now(),
             ),
         )
-    }
-
-    private fun validateQuantityIncrement(
-        request: AddToCartRequest,
-        productOption: ecommerce.model.ProductOption,
-    ) {
-        if (request.newProductOptionQuantity <= productOption.quantity) {
-            throw IllegalArgumentException(
-                "New product option quantity (${request.newProductOptionQuantity}) " +
-                    "must be greater than current quantity (${productOption.quantity})",
-            )
-        }
-    }
-
-    private fun validateCartItemQuantity(
-        requestedQuantity: Int,
-        @Suppress("UNUSED_PARAMETER") productOption: ecommerce.model.ProductOption,
-    ) {
-        if (requestedQuantity <= 0) {
-            throw IllegalArgumentException("Cart item quantity must be greater than 0")
-        }
-
-        if (requestedQuantity > 999) {
-            throw IllegalArgumentException("Maximum quantity per item is 999")
-        }
     }
 
     private fun updateProductOptionQuantity(

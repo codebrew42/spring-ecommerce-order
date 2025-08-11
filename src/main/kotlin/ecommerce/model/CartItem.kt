@@ -57,6 +57,18 @@ class CartItem(
         }
     }
 
+    companion object {
+        fun validateQuantity(requestedQuantity: Int) {
+            if (requestedQuantity <= 0) {
+                throw IllegalArgumentException("Cart item quantity must be greater than 0")
+            }
+
+            if (requestedQuantity > 999) {
+                throw IllegalArgumentException("Maximum quantity per item is 999")
+            }
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CartItem) return false
