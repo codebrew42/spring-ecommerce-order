@@ -27,12 +27,12 @@ class CartStatisticsControllerTest() {
     private lateinit var tokenService: TokenService
 
     private fun createAdminToken(): String {
-        val adminMember = Member("admin@test.com", "password", "Admin User", Role.ADMIN, null, 1L)
+        val adminMember = Member("admin@test.com", "password", "Admin User", Role.ADMIN, 1L)
         return tokenService.generateToken(adminMember)
     }
 
     private fun createUserToken(): String {
-        val userMember = Member("user@test.com", "password", "Regular User", Role.USER, null, 2L)
+        val userMember = Member("user@test.com", "password", "Regular User", Role.USER, 2L)
         return tokenService.generateToken(userMember)
     }
 
