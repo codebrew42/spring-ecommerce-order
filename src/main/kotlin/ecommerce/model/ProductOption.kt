@@ -37,6 +37,15 @@ class ProductOption(
         this.quantity -= quantity
     }
 
+    fun checkQuantityIncrement(newQuantity: Int) {
+        if (newQuantity <= this.quantity) {
+            throw IllegalArgumentException(
+                "New product option quantity ($newQuantity) " +
+                    "must be greater than current quantity (${this.quantity})",
+            )
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is ProductOption) return false
