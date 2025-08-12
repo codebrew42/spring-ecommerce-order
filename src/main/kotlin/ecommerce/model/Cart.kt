@@ -1,0 +1,88 @@
+package ecommerce.model
+
+import com.fasterxml.jackson.annotation.JsonIgnore
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.Index
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
+import org.hibernate.annotations.BatchSize
+import java.time.LocalDateTime
+
+@Entity
+@Table(
+    name = "carts",
+    indexes = [
+        Index(name = "idx_cart_member_id", columnList = "member_id"),
+    ],
+)
+class Cart(
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = true)
+    val member: Member? = null,
+    @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
+    @BatchSize(size = 20)
+    @JsonIgnore
+    val cartItem: MutableList<CartItem> = mutableListOf(),
+    @Column(name = "quantity", nullable = false)
+    var quantity: Int = 0,
+    @Column(name = "updated_at", nullable = false)
+    var newItemAddedAt: LocalDateTime = LocalDateTime.now(),
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
+) {
+    constructor() : this(
+        member = null,
+        cartItem = mutableListOf(),
+        quantity = 0,
+        newItemAddedAt = LocalDateTime.now(),
+    )
+
+    constructor(member: Member) : this(
+        member = member,
+        cartItem = mutableListOf(),
+        quantity = 0,
+        newItemAddedAt = LocalDateTime.now(),
+    )
+
+    fun addQuantity(additionalQuantity: Int) {
+        this.quantity += additionalQuantity
+        updateTimestamp()
+    }
+
+    fun updateTimestamp() {
+        this.newItemAddedAt = LocalDateTime.now()
+    }
+
+    fun updateQuantity(newQuantity: Int) {
+        this.quantity = newQuantity
+        updateTimestamp()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Cart) return false
+
+        if (id != null && other.id != null) {
+            return id == other.id
+        }
+
+        return member == other.member
+    }
+
+    override fun hashCode(): Int {
+        return member?.hashCode() ?: 0
+    }
+
+    override fun toString(): String {
+        return "Cart(id=$id, memberId=${member?.id}, cartItemCount=${cartItem.size}, quantity=$quantity)"
+    }
+}
