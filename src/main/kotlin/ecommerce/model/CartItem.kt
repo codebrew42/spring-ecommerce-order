@@ -26,8 +26,6 @@ class CartItem(
     var productOption: ProductOption,
     @Column(name = "quantity", nullable = true)
     var quantity: Int,
-    @CreationTimestamp
-    var createdAt: LocalDateTime? = null,
     @UpdateTimestamp
     var updatedAt: LocalDateTime? = null,
     @Id
@@ -38,7 +36,6 @@ class CartItem(
         cart: Cart?,
         productOption: ProductOption?,
         quantity: Int,
-        itemAddedAt: LocalDateTime?,
     ) {
         if (cart != null) {
             this.cart = cart

@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.LocalDateTime
+import org.hibernate.annotations.UpdateTimestamp
 
 @Entity
 @Table(name = "members")
@@ -21,6 +23,8 @@ class Member(
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     val role: Role = Role.USER,
+    @UpdateTimestamp
+    var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -55,6 +59,10 @@ class Member(
     ) {
         this.email = newEmail
         this.name = newName
+    }
+
+    fun updateTimestamp() {
+        this.updatedAt = LocalDateTime.now()
     }
 
     override fun toString(): String {

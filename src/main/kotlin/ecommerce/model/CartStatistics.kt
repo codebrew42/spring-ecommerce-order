@@ -28,8 +28,6 @@ class CartStatistics(
     val productOption: ProductOption,
     @Column(name = "quantity", nullable = false)
     val quantity: Int,
-    @CreationTimestamp
-    var createdAt: LocalDateTime? = null,
     @UpdateTimestamp
     var updatedAt: LocalDateTime? = null,
     @Id
