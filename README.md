@@ -94,6 +94,32 @@
 --- 
 ## External API Integration - Step 2 (Development-plan)
 
+### Product Structure
+```
+src/main/kotlin/ecommerce/
+├── controller/                 # REST API endpoints (e.g., Products, Cart)
+├── service/                    # Business logic (e.g., ProductService, CartService)
+├── repository/                 # Spring Data JPA repositories
+├── domain/                     # JPA entities (the core business objects)
+├── web/dto/                    # Data Transfer Objects (Request/Response)
+└── config/                     # Spring configurations (e.g., WebMvcConfig)
+```
+
+### Domain Models
+* **`Member`**: 
+    * Represents a user account with an email, password, and role.
+* **`Product`**: 
+    * A product in the catalog with basic information like name and brand. 
+    * It contains a list of `ProductOption`s.
+* **`ProductOption`**: 
+    * A specific variant of a product (e.g., size, color) with its own price and stock quantity. 
+    * This is the purchasable unit.
+* **`Cart`**: 
+    * A shopping cart linked to a `Member`.
+* **`CartItem`**: 
+    * An item within a `Cart`, linked to a specific `ProductOption` and tracking the quantity.
+
+
 ### Step 2-1: Stripe Payment Integration
 - [ ] Implement Stripe Payment API integration (/config)
     - [ ] class `StripeProperties(val secretKey: String)`
