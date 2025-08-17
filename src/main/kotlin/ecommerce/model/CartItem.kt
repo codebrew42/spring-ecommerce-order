@@ -21,8 +21,8 @@ class CartItem(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = true)
     var cart: Cart,
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "product_option_id", nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_option_id")
     var productOption: ProductOption,
     @Column(name = "quantity", nullable = true)
     var quantity: Int,
