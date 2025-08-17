@@ -62,3 +62,68 @@
 - [x] **Pagination** - Add `Pageable` support to controllers
 - [x] **Inventory Management** - Stock tracking and validation
 - [ ] **Performance** - Query optimization and caching
+
+---
+
+## External API Integration - Step 2 (Feature-list)
+
+### Step 2-1: Stripe Payment Integration
+- [ ] Implement Stripe Payment API integration (/config)
+- [ ] Create Order related entities
+- [ ] Create Payment related entities
+- [ ] Place order functionality
+  - [ ] Decrease product option stock on successful payment
+  - [ ] Remove ordered items from user's cart (if it exists)
+  - [ ] Handle payment failures with clear error messages  (expired session, invalid payment method, insufficient balance, etc.)
+- [ ] Payment error handling for declined payments (using Stripe test cards)
+
+### Step 2-2: Orders Management
+- [ ] Implement Orders API endpoints
+- [ ] Display order information:
+    - [] (mandatory) Order date and time, Order status, Purchased items, Checkout session Id (issued by stripe), Payment amount
+    - [] (optional) other payment-related fields
+- [ ] Design database schema for orders and payments
+
+### Step 2-3: Deployment
+- [ ] Create automated deployment script
+- [ ] Configure CORS for client-server interaction (?)
+- [ ] Handle security considerations for production deployment
+    - [] for example, when server and client have different `Origin` values
+- [] (optional) implement `HTTPS`
+
+--- 
+## External API Integration - Step 2 (Development-plan)
+
+### Step 2-1: Stripe Payment Integration
+- [ ] Implement Stripe Payment API integration (/config)
+    - [ ] class `StripeProperties(val secretKey: String)`
+    - [ ] class `StripeClient(private val stripePropierties)`
+- [ ] Create Order related entities
+    - [ ] class `CreateOrderRequest(val customerName, val customerEmail, val items)`
+- [ ] Create Payment related entities
+    - [ ] class `CreatePaymentIntentRequest(val orderId: Long)`
+    - [ ] class `CreatePaymentIntentResponse(val clientSecret: String)`
+- [ ] Place order functionality
+    - [ ] Decrease product option stock on successful payment
+    - [ ] Remove ordered items from user's cart (if it exists)
+    - [ ] Handle payment failures with clear error messages  (expired session, invalid payment method, insufficient balance, etc.)
+        - [ ] add annotation to `Application` : `@EnableConfigurationProperties(StripeProperties::class)`
+        - [ ] class `OrderController` contains
+            - [ ] `createOrder`, `getOrder`, `createPaymentIntent`
+        - [ ] class `OrderService`, `OrderRepository`, `OrderStatus` 
+        - [ ] add your db and stripe credentials `resources/application.properties`
+- [ ] Payment error handling for declined payments (using Stripe test cards)
+
+### Step 2-2: Orders Management
+- [ ] Implement Orders API endpoints
+- [ ] Display order information:
+    - [] (mandatory) Order date and time, Order status, Purchased items, Checkout session Id (issued by stripe), Payment amount
+    - [] (optional) other payment-related fields
+- [ ] Design database schema for orders and payments
+
+### Step 2-3: Deployment
+- [ ] Create automated deployment script
+- [ ] Configure CORS for client-server interaction (?)
+- [ ] Handle security considerations for production deployment
+    - [] for example, when server and client have different `Origin` values
+- [] (optional) implement `HTTPS`
