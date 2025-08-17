@@ -9,45 +9,43 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
-import java.util.Objects
 
 @Entity
-@Table(name = "cart_statistics")
-class CartStatistics(
+@Table(name = "order_items")
+class OrderItem(
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_item_id", nullable = false)
-    val cartItem: CartItem,
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
-    val cart: Cart,
+    @JoinColumn(name = "order_id", nullable = false)
+    val order: Order,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_option_id", nullable = false)
     val productOption: ProductOption,
     @Column(name = "quantity", nullable = false)
     val quantity: Int,
-    @CreationTimestamp
-    var createdAt: LocalDateTime? = null,
-    @UpdateTimestamp
-    var updatedAt: LocalDateTime? = null,
+    @Column(name = "unit_price", nullable = false)
+    val unitPrice: Int,
+    @Column(name = "created_at", nullable = false)
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    @Column(name = "updated_at", nullable = false)
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    val totalPrice: Int
+        get() = quantity * unitPrice
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is CartStatistics) return false
-
-        if (id != null && other.id != null) {
-            return id == other.id
-        }
-
-        return cartItem == other.cartItem && updatedAt == other.updatedAt
+        if (other !is OrderItem) return false
+        return id != null && id == other.id
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(cartItem.id, updatedAt)
+        return id?.hashCode() ?: 0
+    }
+
+    override fun toString(): String {
+        return "OrderItem(id=$id, orderId=${order.id}, productOptionId=${productOption.id}, quantity=$quantity, unitPrice=$unitPrice)"
     }
 }

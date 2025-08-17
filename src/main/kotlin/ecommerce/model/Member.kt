@@ -7,16 +7,10 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(
-    name = "members",
-    indexes = [
-        Index(name = "idx_member_email", columnList = "email"),
-    ],
-)
+@Table(name = "members")
 class Member(
     @Column(name = "email", nullable = false, unique = true)
     var email: String,

@@ -6,22 +6,17 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 import java.util.Objects
 
 @Entity
-@Table(
-    name = "cart_items",
-    indexes = [
-        Index(name = "idx_cart_item_cart_id", columnList = "cart_id"),
-        Index(name = "idx_cart_item_product_option_id", columnList = "product_option_id"),
-    ],
-)
+@Table(name = "cart_items")
 class CartItem(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = true)
@@ -31,8 +26,10 @@ class CartItem(
     var productOption: ProductOption,
     @Column(name = "quantity", nullable = true)
     var quantity: Int,
-    @Column(name = "updatedAt", nullable = false)
-    var itemAddedAt: LocalDateTime? = null,
+    @CreationTimestamp
+    var createdAt: LocalDateTime? = null,
+    @UpdateTimestamp
+    var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -52,9 +49,11 @@ class CartItem(
         if (quantity != null) {
             this.quantity = quantity
         }
-        if (itemAddedAt != null) {
-            this.itemAddedAt = itemAddedAt
-        }
+        updateTimestamp()
+    }
+
+    fun updateTimestamp() {
+        this.updatedAt = LocalDateTime.now()
     }
 
     companion object {
