@@ -16,24 +16,28 @@ import java.time.LocalDateTime
 class OrderItem(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    val order: Order,
+    var order: Order,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_option_id", nullable = false)
-    val productOption: ProductOption,
+    var productOption: ProductOption,
     @Column(name = "quantity", nullable = false)
-    val quantity: Int,
+    var quantity: Int,
     @Column(name = "unit_price", nullable = false)
-    val unitPrice: Int,
+    var unitPrice: Double,
+    @Column(name = "total_price", nullable = false)
+    var totalPrice: Double,
     @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: LocalDateTime = LocalDateTime.now(),
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now(),
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    val totalPrice: Int
-        get() = quantity * unitPrice
+    fun OrderItem.getTotalAmount(): Double {
+        totalPrice = quantity * unitPrice
+        return totalPrice
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

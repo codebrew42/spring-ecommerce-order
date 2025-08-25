@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 import java.util.Objects
+import org.springframework.data.jpa.domain.AbstractPersistable_.id
 
 @Entity
 @Table(name = "cart_items")
@@ -32,37 +33,17 @@ class CartItem(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun modify(
-        cart: Cart?,
-        productOption: ProductOption?,
-        quantity: Int,
-    ) {
-        if (cart != null) {
-            this.cart = cart
-        }
-        if (productOption != null) {
-            this.productOption = productOption
-        }
-        if (quantity != null) {
-            this.quantity = quantity
-        }
-        updateTimestamp()
+    fun CartItem.getTotalAmount(): Double {
+        return quantity * productOption.price
+    }
+
+    fun addQuantity(requestedQuantity: Int) {
+        require(requestedQuantity > 0) { "Requested Quantity must be greater than 0" }
+        this.quantity += requestedQuantity
     }
 
     fun updateTimestamp() {
         this.updatedAt = LocalDateTime.now()
-    }
-
-    companion object {
-        fun validateQuantity(requestedQuantity: Int) {
-            if (requestedQuantity <= 0) {
-                throw IllegalArgumentException("Cart item quantity must be greater than 0")
-            }
-
-            if (requestedQuantity > 999) {
-                throw IllegalArgumentException("Maximum quantity per item is 999")
-            }
-        }
     }
 
     override fun equals(other: Any?): Boolean {

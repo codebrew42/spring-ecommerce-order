@@ -21,6 +21,8 @@ class ProductOption(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     var product: Product,
+    @Column(name = "price", nullable = false)
+    var price: Double,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,

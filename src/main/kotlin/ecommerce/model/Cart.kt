@@ -22,7 +22,7 @@ class Cart(
     @JoinColumn(name = "member_id", nullable = true)
     val member: Member? = null,
     @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
-    val cartItem: MutableList<CartItem> = mutableListOf(),
+    val cartItems: MutableList<CartItem> = mutableListOf(),
     @Column(name = "quantity", nullable = false)
     var quantity: Int = 0,
     @CreationTimestamp
@@ -33,7 +33,14 @@ class Cart(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    fun Cart.getTotalAmount() {
+        return cartItems.sumOf {
+            it.getTotalAmount()
+        }
+    }
+
     fun addQuantity(additionalQuantity: Int) {
+        require(additionalQuantity > 0) { "Quantity to add must be greater than 0" }
         this.quantity += additionalQuantity
         updateTimestamp()
     }
@@ -42,9 +49,8 @@ class Cart(
         this.updatedAt = LocalDateTime.now()
     }
 
-    fun updateQuantity(newQuantity: Int) {
-        this.quantity = newQuantity
-        updateTimestamp()
+    fun updateItemQuantity(productOptionId: Long, quantity: Int) {
+    //TODO: finding and updating a specific cart item within the cart object itself.
     }
 
     override fun equals(other: Any?): Boolean {

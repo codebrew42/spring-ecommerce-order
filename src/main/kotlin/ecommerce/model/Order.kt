@@ -1,5 +1,6 @@
 package ecommerce.model
 
+import ecommerce.dto.order.OrderRequest
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -16,6 +17,7 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
+import org.springframework.data.jpa.repository.Modifying
 
 @Entity
 @Table(name = "orders")
@@ -27,9 +29,9 @@ class Order(
     val stripeCheckoutSessionId: String,
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
-    val orderStatus: OrderStatus = OrderStatus.PENDING,
-    @Column(name = "payment_amount", nullable = false)
-    val paymentAmount: Int,
+    val orderStatus: OrderStatus,
+    @Column(name = "total_amount", nullable = false)
+    var totalAmount: Double,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val orderItems: MutableList<OrderItem> = mutableListOf(),
     @CreationTimestamp
@@ -40,6 +42,12 @@ class Order(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    fun Order.getTotalAmount(): Double {
+        return orderItems.sumOf {
+            it.getTotalAmount()
+        }
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Order) return false
