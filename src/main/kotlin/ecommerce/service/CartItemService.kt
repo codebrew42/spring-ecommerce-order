@@ -21,18 +21,15 @@ class CartItemService(
         request: AddToCartRequest,
         cartId: Long,
     ): CartItem {
-        var cart =
-            cartRepository.findById(cartId).getOrNull()
-                ?: throw NotFoundException("Cart not found")
-        var productOption =
-            productOptionRepository.findById(request.productOptionId).getOrNull()
-                ?: throw NotFoundException("Product Option not found")
-        val cartItem =
-            CartItem(
-                cart = cart,
-                productOption = productOption,
-                quantity = request.newProductOptionQuantity,
-            )
+        val cart = cartRepository.findById(cartId).getOrNull()
+            ?: throw NotFoundException("Cart not found")
+        val productOption = productOptionRepository.findById(request.productOptionId).getOrNull()
+            ?: throw NotFoundException("Product Option not found")
+        val cartItem = CartItem(
+            cart = cart,
+            productOption = productOption,
+            quantity = request.newProductOptionQuantity,
+        )
         return cartItemRepository.save(cartItem)
     }
 
@@ -40,15 +37,14 @@ class CartItemService(
     fun updateCartItem(
         request: AddToCartRequest,
         cartId: Long,
-        cartItemId: Long,
+        cartItemId: Long
     ): CartItem {
-        var cart =
-            cartRepository.findById(cartId).getOrNull()
-                ?: throw NotFoundException("Cart not found")
-        val cartItem =
-            cartItemRepository.findById(cartItemId).getOrNull()
-                ?: throw NotFoundException("cart Item not found")
-        if (cartItem.cart.id != cart.id) {
+        val cart = cartRepository.findById(cartId).getOrNull()
+            ?: throw NotFoundException("Cart not found")
+        val cartItem = cartItemRepository.findById(cartItemId).getOrNull()
+            ?: throw NotFoundException("cart Item not found")
+        if (cartItem.cart.id != cart.id)
+        {
             throw IllegalArgumentException("Cart item does not belong to cartId=$cartId")
         }
         cartItem.quantity = request.newProductOptionQuantity
