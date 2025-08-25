@@ -1,7 +1,7 @@
 package ecommerce.service
 
-import ecommerce.dto.member.RegisterRequest
 import ecommerce.dto.member.MemberUpdateRequest
+import ecommerce.dto.member.RegisterRequest
 import ecommerce.exception.AuthenticationException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Cart
