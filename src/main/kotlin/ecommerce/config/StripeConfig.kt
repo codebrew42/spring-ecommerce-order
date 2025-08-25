@@ -1,10 +1,11 @@
 package ecommerce.config
 
-import ecommerce.dto.payment.PaymentRequest
+import ecommerce.dto.payment.PaymentIntentRequest
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
+import org.springframework.boot.context.properties.ConfigurationProperties
 
 @Component
 class StripeClient(
@@ -12,7 +13,7 @@ class StripeClient(
 ) {
     private val restClient = RestClient.create()
 
-    fun createCheckoutSession(req: PaymentRequest): String? {
+    fun createCheckoutSession(req: PaymentIntentRequest): String? {
         val body =
             listOf(
                 "amount=${req.amount}",
@@ -39,3 +40,8 @@ class StripeClient(
         }
     }
 }
+
+@ConfigurationProperties("stripe")
+data class StripeProperties(
+    val secretKey: String,
+)
