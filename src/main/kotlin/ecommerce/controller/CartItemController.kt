@@ -18,21 +18,21 @@ class CartItemController(
     private val cartItemService: CartItemService,
 ) {
     @PostMapping("")
-    fun addToCart(
+    fun addCartItemToCart(
         @PathVariable cartId: Long,
         @RequestBody request: AddToCartRequest,
     ): ResponseEntity<CartItem> {
-        val cartItem = cartItemService.saveCartItem(request, cartId)
+        val cartItem = cartItemService.addCartItem(request, cartId)
         return ResponseEntity.ok(cartItem)
     }
 
     @PutMapping("/{itemId}")
-    fun updateCartItemForIncrement(
+    fun updateCartItem(
         @PathVariable itemId: Long,
         @PathVariable cartId: Long,
         @RequestBody request: AddToCartRequest,
     ): ResponseEntity<CartItem> {
-        val updatedItem = cartItemService.saveCartItem(request, itemId, cartId)
+        val updatedItem = cartItemService.updateCartItem(request, itemId, cartId)
         return ResponseEntity.ok(updatedItem)
     }
 

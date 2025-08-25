@@ -14,7 +14,6 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 import java.util.Objects
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 
 @Entity
 @Table(name = "cart_items")
@@ -22,30 +21,22 @@ class CartItem(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = true)
     var cart: Cart,
-    @ManyToOne(fetch = FetchType.LAZY)
+    // TODO check EAGER or LAZY
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_option_id")
     var productOption: ProductOption,
     @Column(name = "quantity", nullable = true)
     var quantity: Int,
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime? = null,
     @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun CartItem.getTotalAmount(): Double {
-        return quantity * productOption.price
-    }
-
-    fun addQuantity(requestedQuantity: Int) {
-        require(requestedQuantity > 0) { "Requested Quantity must be greater than 0" }
-        this.quantity += requestedQuantity
-    }
-
-    fun updateTimestamp() {
-        this.updatedAt = LocalDateTime.now()
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is CartItem) return false
@@ -65,3 +56,100 @@ class CartItem(
         return "CartItem(id=$id, cartId=${cart.id}, productOptionId=${productOption.id}, quantity=$quantity)"
     }
 }
+
+/* prev ver
+
+package ecommerce.model
+
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
+import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
+import java.time.LocalDateTime
+import java.util.Objects
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
+
+@Entity
+@Table(name = "cart_items")
+class CartItem(
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id", nullable = true)
+    var cart: Cart,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_option_id")
+    var productOption: ProductOption,
+    @Column(name = "quantity", nullable = true)
+    var quantity: Int,
+    @UpdateTimestamp
+    var updatedAt: LocalDateTime? = null,
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = null,
+) {
+<<<<<<< Updated upstream
+    fun modify(
+        cart: Cart?,
+        productOption: ProductOption?,
+        quantity: Int,
+    ) {
+        if (cart != null) {
+            this.cart = cart
+        }
+        if (productOption != null) {
+            this.productOption = productOption
+        }
+        if (quantity != null) {
+            this.quantity = quantity
+        }
+        updateTimestamp()
+    }
+
+    fun updateTimestamp() {
+        this.updatedAt = LocalDateTime.now()
+    }
+
+    companion object {
+        fun validateQuantity(requestedQuantity: Int) {
+            if (requestedQuantity <= 0) {
+                throw IllegalArgumentException("Cart item quantity must be greater than 0")
+            }
+
+            if (requestedQuantity > 999) {
+                throw IllegalArgumentException("Maximum quantity per item is 999")
+            }
+        }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CartItem) return false
+
+        if (id == null || other.id == null) {
+            return cart == other.cart && productOption == other.productOption
+        }
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return Objects.hash(cart.id, productOption.id)
+    }
+
+=======
+>>>>>>> Stashed changes
+    override fun toString(): String {
+        return "CartItem(id=$id, cartId=${cart.id}, productOptionId=${productOption.id}, quantity=$quantity)"
+    }
+}
+
+
+ */

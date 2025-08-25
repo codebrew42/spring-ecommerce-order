@@ -69,7 +69,7 @@ class CartItemServiceTest {
         `when`(cartItemRepository.findByCartAndProductOption(testCart, testProductOption)).thenReturn(null)
         `when`(cartItemRepository.save(any(CartItem::class.java))).thenReturn(testCartItem)
 
-        val result = cartItemService.saveCartItem(request, cartId)
+        val result = cartItemService.addCartItem(request, cartId)
 
         assertNotNull(result)
         verify(cartRepository).findById(cartId)
@@ -88,7 +88,7 @@ class CartItemServiceTest {
         `when`(productOptionRepository.findById(request.productOptionId)).thenReturn(Optional.of(testProductOption))
         `when`(cartItemRepository.findByCartAndProductOption(testCart, testProductOption)).thenReturn(existingCartItem)
 
-        val result = cartItemService.saveCartItem(request, cartId)
+        val result = cartItemService.addCartItem(request, cartId)
 
         assertNotNull(result)
         verify(cartItemRepository, never()).save(any(CartItem::class.java))
@@ -103,7 +103,7 @@ class CartItemServiceTest {
         `when`(cartRepository.findById(cartId)).thenReturn(Optional.empty())
 
         assertThrows(NotFoundException::class.java) {
-            cartItemService.saveCartItem(request, cartId)
+            cartItemService.addCartItem(request, cartId)
         }
         verify(cartRepository).findById(cartId)
     }
@@ -117,7 +117,7 @@ class CartItemServiceTest {
         `when`(productOptionRepository.findById(request.productOptionId)).thenReturn(Optional.empty())
 
         assertThrows(NotFoundException::class.java) {
-            cartItemService.saveCartItem(request, cartId)
+            cartItemService.addCartItem(request, cartId)
         }
     }
 

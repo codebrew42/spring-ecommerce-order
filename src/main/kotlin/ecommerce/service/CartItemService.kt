@@ -8,7 +8,6 @@ import ecommerce.repository.CartRepository
 import ecommerce.repository.ProductOptionRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import kotlin.jvm.optionals.getOrNull
 
 @Service
@@ -18,78 +17,42 @@ class CartItemService(
     private val productOptionRepository: ProductOptionRepository,
 ) {
     @Transactional
-    fun saveCartItem(
+    fun addCartItem(
         request: AddToCartRequest,
         cartId: Long,
-        cartItemId: Long? = null,
     ): CartItem {
-        val cart = findCartById(cartId)
-        val productOption = findProductOptionById(request.productOptionId)
-        val existingCartItem = findExistingCartItem(cartItemId, cart, productOption)
-
-        return if (existingCartItem != null) {
-            updateExistingCartItem(existingCartItem, request, productOption, cart, cartItemId != null)
-        } else {
-            createNewCartItem(cart, productOption, request)
-        }
-    }
-
-    private fun findCartById(cartId: Long) =
-        cartRepository.findById(cartId).getOrNull()
-            ?: throw NotFoundException("Cart not found")
-
-    private fun findProductOptionById(productOptionId: Long) =
-        productOptionRepository.findById(productOptionId).getOrNull()
-            ?: throw NotFoundException("Product option not found")
-
-    private fun findExistingCartItem(
-        cartItemId: Long?,
-        cart: ecommerce.model.Cart,
-        productOption: ecommerce.model.ProductOption,
-    ) = cartItemId?.let { cartItemRepository.findById(it).getOrNull() }
-        ?: cartItemRepository.findByCartAndProductOption(cart, productOption)
-
-    private fun updateExistingCartItem(
-        existingCartItem: CartItem,
-        request: AddToCartRequest,
-        productOption: ecommerce.model.ProductOption,
-        cart: ecommerce.model.Cart,
-        isDirectUpdate: Boolean,
-    ): CartItem {
-        if (isDirectUpdate) {
-            productOption.checkQuantityIncrement(request.newProductOptionQuantity)
-            productOption.updateQuantity(request.newProductOptionQuantity)
-            productOptionRepository.save(productOption)
-            cart.addQuantity(request.newProductOptionQuantity)
-        }
-
-        val newQuantity =
-            if (isDirectUpdate) {
-                request.newProductOptionQuantity
-            } else {
-                existingCartItem.quantity + request.newProductOptionQuantity
-            }
-
-        CartItem.validateQuantity(newQuantity)
-        existingCartItem.modify(null, null, newQuantity, LocalDateTime.now())
-        return existingCartItem
-    }
-
-    private fun createNewCartItem(
-        cart: ecommerce.model.Cart,
-        productOption: ecommerce.model.ProductOption,
-        request: AddToCartRequest,
-    ): CartItem {
-        CartItem.validateQuantity(request.newProductOptionQuantity)
-
-        return cartItemRepository.save(
+        var cart =
+            cartRepository.findById(cartId).getOrNull()
+                ?: throw NotFoundException("Cart not found")
+        var productOption =
+            productOptionRepository.findById(request.productOptionId).getOrNull()
+                ?: throw NotFoundException("Product Option not found")
+        val cartItem =
             CartItem(
                 cart = cart,
                 productOption = productOption,
                 quantity = request.newProductOptionQuantity,
-                itemAddedAt = LocalDateTime.now(),
-            ),
-        )
+            )
+        return cartItemRepository.save(cartItem)
+    }
+
+    @Transactional
+    fun updateCartItem(
+        request: AddToCartRequest,
+        cartId: Long,
+        cartItemId: Long,
+    ): CartItem {
+        var cart =
+            cartRepository.findById(cartId).getOrNull()
+                ?: throw NotFoundException("Cart not found")
+        val cartItem =
+            cartItemRepository.findById(cartItemId).getOrNull()
+                ?: throw NotFoundException("cart Item not found")
+        if (cartItem.cart.id != cart.id) {
+            throw IllegalArgumentException("Cart item does not belong to cartId=$cartId")
+        }
+        cartItem.quantity = request.newProductOptionQuantity
+        return cartItemRepository.save(cartItem)
     }
 
     @Transactional
