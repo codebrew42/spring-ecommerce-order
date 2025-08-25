@@ -1,6 +1,5 @@
 package ecommerce.model
 
-import ecommerce.dto.order.OrderRequest
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -17,7 +16,6 @@ import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
-import org.springframework.data.jpa.repository.Modifying
 
 @Entity
 @Table(name = "orders")
@@ -42,7 +40,7 @@ class Order(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun Order.getTotalAmount(): Double {
+    fun getTotalAmount(): Double {
         return orderItems.sumOf {
             it.getTotalAmount()
         }
@@ -59,6 +57,7 @@ class Order(
     }
 
     override fun toString(): String {
-        return "Order(id=$id, stripeCheckoutSessionId='$stripeCheckoutSessionId', status=$orderStatus, amount=$paymentAmount)"
+        val amount = getTotalAmount()
+        return "Order(id=$id, stripeCheckoutSessionId='$stripeCheckoutSessionId', status=$orderStatus, amount=$amount)"
     }
 }

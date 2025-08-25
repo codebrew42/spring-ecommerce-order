@@ -34,7 +34,7 @@ class OrderItem(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun OrderItem.getTotalAmount(): Double {
+    fun getTotalAmount(): Double {
         totalPrice = quantity * unitPrice
         return totalPrice
     }

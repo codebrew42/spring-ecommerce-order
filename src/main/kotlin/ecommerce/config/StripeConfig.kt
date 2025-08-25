@@ -1,11 +1,11 @@
 package ecommerce.config
 
 import ecommerce.dto.payment.PaymentIntentRequest
+import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import org.springframework.boot.context.properties.ConfigurationProperties
 
 @Component
 class StripeClient(
