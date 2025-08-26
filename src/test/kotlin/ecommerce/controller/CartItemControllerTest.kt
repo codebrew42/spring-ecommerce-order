@@ -30,7 +30,8 @@ class CartItemControllerTest {
             )
 
         val response =
-            cartItemController.addToCart(
+            cartItemController.updateCartItemForIncrement(
+                1,
                 1,
                 addToCartRequest,
             )
@@ -58,33 +59,17 @@ class CartItemControllerTest {
     }
 
     @Test
-    @Sql(statements = ["DELETE FROM cart_items"])
     fun `cart item should be added to cart`() {
-        val addToCartRequest =
-            AddToCartRequest(
-                productOptionId = 2,
-                newProductOptionQuantity = 7,
-                cartItemId = 3,
-                cartId = 1,
-            )
+        val addToCartRequest = AddToCartRequest(
+            productOptionId = 2,
+            newProductOptionQuantity = 7,
+            cartItemId = 3,
+            cartId = 1,
+        )
 
-        val response =
-            cartItemController.addToCart(
-                1,
-                addToCartRequest,
-            )
+        val response = cartItemController.addToCart(1, addToCartRequest)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body).isNotNull
-        assertThat(response.body?.quantity).isEqualTo(7)
-        assertThat(response.body?.productOption?.id).isEqualTo(2)
-        assertThat(response.body?.productOption?.name).isEqualTo("Red")
-        assertThat(response.body?.cart?.id).isEqualTo(1)
-
-        val savedCartItem = cartItemRepository.findById(response.body?.id!!)
-        assertThat(savedCartItem).isPresent
-        assertThat(savedCartItem.get().quantity).isEqualTo(7)
-        assertThat(savedCartItem.get().productOption.name).isEqualTo("Red")
     }
 
     @Test

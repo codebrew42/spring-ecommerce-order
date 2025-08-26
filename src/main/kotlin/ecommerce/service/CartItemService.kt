@@ -5,6 +5,7 @@ import ecommerce.exception.NotFoundException
 import ecommerce.model.CartItem
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
+import ecommerce.repository.CartStatisticsRepository
 import ecommerce.repository.ProductOptionRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -15,6 +16,7 @@ class CartItemService(
     private val cartRepository: CartRepository,
     private val cartItemRepository: CartItemRepository,
     private val productOptionRepository: ProductOptionRepository,
+    private val cartStatisticsRepository: CartStatisticsRepository,
 ) {
     @Transactional
     fun addCartItem(
@@ -71,6 +73,7 @@ class CartItemService(
     fun deleteAllCartItemsByCartId(cartId: Long) {
         cartRepository.findById(cartId).getOrNull()
             ?: throw NotFoundException("Cart not found")
+        cartStatisticsRepository.deleteByCartId(cartId)
         cartItemRepository.deleteByCartId(cartId)
     }
 }

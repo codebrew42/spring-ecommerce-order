@@ -22,7 +22,7 @@ class CartItem(
     @JoinColumn(name = "cart_id", nullable = true)
     var cart: Cart,
     // TODO check EAGER or LAZY
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_option_id")
     var productOption: ProductOption,
     @Column(name = "quantity", nullable = true)

@@ -127,7 +127,6 @@ class CartItemServiceIntegrationTest {
 
         cartItemService.deleteAllCartItemsByCartId(1)
 
-        val itemsAfter = cartItemRepository.findByCartId(1)
-        assertThat(itemsAfter.size).isEqualTo(0)
+        assertThat(cartItemRepository.findByCartId(1)).isEmpty()
     }
 }

@@ -10,6 +10,7 @@ import ecommerce.model.ProductOption
 import ecommerce.model.Role
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
+import ecommerce.repository.CartStatisticsRepository
 import ecommerce.repository.ProductOptionRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mock
 import org.mockito.Mockito.any
-import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
@@ -34,6 +34,9 @@ class CartItemServiceTest {
 
     @Mock
     private lateinit var productOptionRepository: ProductOptionRepository
+
+    @Mock
+    private lateinit var cartStatisticsRepository: CartStatisticsRepository
 
     private lateinit var cartItemService: CartItemService
 
@@ -51,6 +54,7 @@ class CartItemServiceTest {
                 cartRepository,
                 cartItemRepository,
                 productOptionRepository,
+                cartStatisticsRepository,
             )
         testMember = Member("test@example.com", "password", "Test User", Role.USER, id = 1L)
         testCart = Cart(member = testMember, id = 1L)
@@ -60,13 +64,12 @@ class CartItemServiceTest {
     }
 
     @Test
-    fun `addCartItem should create new cart item when item doesn't exist`() {
+    fun `addCartItem should create new cart item successfully`() {
         val request = AddToCartRequest(1L, 3, 1L, 1L)
         val cartId = 1L
 
         `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
         `when`(productOptionRepository.findById(request.productOptionId)).thenReturn(Optional.of(testProductOption))
-        `when`(cartItemRepository.findByCartAndProductOption(testCart, testProductOption)).thenReturn(null)
         `when`(cartItemRepository.save(any(CartItem::class.java))).thenReturn(testCartItem)
 
         val result = cartItemService.addCartItem(request, cartId)
@@ -74,25 +77,24 @@ class CartItemServiceTest {
         assertNotNull(result)
         verify(cartRepository).findById(cartId)
         verify(productOptionRepository).findById(request.productOptionId)
-        verify(cartItemRepository).findByCartAndProductOption(testCart, testProductOption)
         verify(cartItemRepository).save(any(CartItem::class.java))
     }
 
     @Test
-    fun `addCartItem should update existing cart item when item exists`() {
+    fun `updateCartItem should update cart item quantity successfully`() {
         val request = AddToCartRequest(1L, 3, 1L, 1L)
         val cartId = 1L
         val existingCartItem = CartItem(testCart, testProductOption, 2, LocalDateTime.now(), id = 1L)
 
         `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
-        `when`(productOptionRepository.findById(request.productOptionId)).thenReturn(Optional.of(testProductOption))
-        `when`(cartItemRepository.findByCartAndProductOption(testCart, testProductOption)).thenReturn(existingCartItem)
+        `when`(cartItemRepository.findById(existingCartItem.id!!)).thenReturn(Optional.of(existingCartItem))
+        `when`(cartItemRepository.save(existingCartItem)).thenReturn(existingCartItem)
 
-        val result = cartItemService.addCartItem(request, cartId)
+        val result = cartItemService.updateCartItem(request, cartId, existingCartItem.id!!)
 
         assertNotNull(result)
-        verify(cartItemRepository, never()).save(any(CartItem::class.java))
-        assertThat(result.quantity).isEqualTo(5) // 2+3
+        assertThat(result.quantity).isEqualTo(3) // Updated to new quantity
+        verify(cartItemRepository).save(existingCartItem)
     }
 
     @Test
@@ -170,6 +172,7 @@ class CartItemServiceTest {
         cartItemService.deleteAllCartItemsByCartId(cartId)
 
         verify(cartRepository).findById(cartId)
+        verify(cartStatisticsRepository).deleteByCartId(cartId)
         verify(cartItemRepository).deleteByCartId(cartId)
     }
 

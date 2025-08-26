@@ -43,5 +43,5 @@ class StripeClient(
 
 @ConfigurationProperties("stripe")
 data class StripeProperties(
-    val secretKey: String,
+    val secretKey: String = "sk_test_default_key",
 )
