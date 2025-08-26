@@ -40,6 +40,8 @@ interface CartStatisticsRepository : JpaRepository<CartStatistics, Long> {
     )
     fun findMembersActiveInLast7Days(sevenDaysAgo: LocalDateTime = LocalDateTime.now().minusDays(7)): List<ActiveUserAnalytics>
 
+    @Modifying
     @Transactional
+    @Query("DELETE FROM CartStatistics cs WHERE cs.cart.id = :cartId")
     fun deleteByCartId(cartId: Long)
 }
