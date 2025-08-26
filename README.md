@@ -92,11 +92,22 @@
 - [x] Design database schema for orders and payments
 
 ### Step 2-3: Deployment
-- [ ] Create automated deployment script
-- [ ] Configure CORS for client-server interaction (?)
+- [x] Create automated deployment script (start.sh)
+  - [x] Build JAR file with gradle
+  - [x] Stop existing application process
+  - [x] Copy new JAR to deployment location
+  - [x] Start application with nohup
+- [x] Configure CORS for client-server interaction
+  - [x] Add CORS configuration to WebMvcConfig
+  - [x] Allow cross-origin requests from frontend
+  - [x] Test CORS with OPTIONS requests
 - [ ] Handle security considerations for production deployment
-    - [] for example, when server and client have different `Origin` values
-- [] (optional) implement `HTTPS`
+  - [x] Set up proper logging for production
+  - [x] Ensure JWT secret is environment-based (via .env file)
+  - [ ] Configure proper CORS origins (not wildcard in production)
+- [ ] (optional) Implement HTTPS
+- [x] Test deployment on AWS instance
+- [ ] Verify application runs correctly in production environment
 
 --- 
 ## External API Integration - Step 2 (Development-plan)
