@@ -61,7 +61,6 @@ class Cart(
     }
 
     override fun toString(): String {
-        //TODO: Check id
         return "Cart(id=$id, memberId=${member?.id}, cartItemCount=${cartItem.size}, quantity=$quantity)"
     }
 }

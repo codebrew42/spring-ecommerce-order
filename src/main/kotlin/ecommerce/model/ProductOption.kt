@@ -33,19 +33,6 @@ class ProductOption(
         this.quantity -= quantity
     }
 
-    fun checkQuantityIncrement(newQuantity: Int) {
-        if (newQuantity <= this.quantity) {
-            throw IllegalArgumentException(
-                "New product option quantity ($newQuantity) " +
-                        "must be greater than current quantity (${this.quantity})",
-            )
-        }
-    }
-
-    fun updateQuantity(newQuantity: Int) {
-        this.quantity = newQuantity
-    }
-
     fun updateProductOption(
         newName: String,
         newQuantity: Int,
