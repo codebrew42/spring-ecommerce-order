@@ -95,9 +95,36 @@ class CheckoutControllerTest {
     }
 
     @Test
-    fun `should return 404 when confirming payment for non-existent order`() {
-        mockMvc.post("/api/checkout/confirm/999999") {
+    fun `should return 400 for invalid payment method`() {
+        val request =
+            CreateOrderRequest(
+                cartItemIds = listOf(1L),
+                paymentMethod = "",
+                currency = Currency.EUR,
+            )
+
+        mockMvc.post("/api/checkout") {
             header("Authorization", "Bearer $userToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(request)
+        }.andExpect {
+            status { isBadRequest() }
+        }
+    }
+
+    @Test
+    fun `should return 404 for non-existent cart items`() {
+        val request =
+            CreateOrderRequest(
+                cartItemIds = listOf(999999L),
+                paymentMethod = "pm_card_visa",
+                currency = Currency.EUR,
+            )
+
+        mockMvc.post("/api/checkout") {
+            header("Authorization", "Bearer $userToken")
+            contentType = MediaType.APPLICATION_JSON
+            content = objectMapper.writeValueAsString(request)
         }.andExpect {
             status { isNotFound() }
         }
