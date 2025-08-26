@@ -17,6 +17,7 @@ class WebMvcConfig(
             .addPathPatterns("/api/cart/**")
             .addPathPatterns("/api/carts/**")
             .addPathPatterns("/api/cart-items/**")
+            .addPathPatterns("/api/checkout/**")
             .addPathPatterns("/api/admin/**")
     }
 
