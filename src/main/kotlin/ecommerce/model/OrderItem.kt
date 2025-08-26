@@ -75,21 +75,6 @@ class OrderItem(
     }
 
     companion object {
-        fun fromCartItem(
-            cartItem: CartItem,
-            order: Order,
-        ): OrderItem {
-            return OrderItem(
-                order = order,
-                productOption = cartItem.productOption,
-                quantity = cartItem.quantity,
-                unitPrice = cartItem.productOption.price,
-                totalPrice = cartItem.quantity * cartItem.productOption.price,
-                productName = cartItem.productOption.product.name,
-                optionName = cartItem.productOption.name,
-            )
-        }
-
         fun fromProductOption(
             productOption: ProductOption,
             quantity: Int,

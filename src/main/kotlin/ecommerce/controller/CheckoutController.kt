@@ -32,7 +32,7 @@ class CheckoutController(
             PaymentIntentRequest(
                 amount = order.totalAmount,
                 currency = order.currency,
-                paymentMethod = request.paymentMethod,
+                paymentMethod = "pm_card_visa",
             )
 
         val checkoutResponse = paymentService.processPayment(paymentIntentRequest, order)

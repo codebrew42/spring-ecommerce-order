@@ -46,7 +46,6 @@ class CheckoutControllerTest {
         val request =
             CreateOrderRequest(
                 cartItemIds = listOf(1L),
-                paymentMethod = "pm_card_visa",
                 currency = Currency.EUR,
             )
 
@@ -63,7 +62,6 @@ class CheckoutControllerTest {
         val request =
             CreateOrderRequest(
                 cartItemIds = emptyList(),
-                paymentMethod = "pm_card_visa",
                 currency = Currency.EUR,
             )
 
@@ -81,7 +79,6 @@ class CheckoutControllerTest {
         val request =
             CreateOrderRequest(
                 cartItemIds = listOf(999999L),
-                paymentMethod = "pm_card_visa",
                 currency = Currency.EUR,
             )
 
