@@ -68,21 +68,28 @@
 ## External API Integration - Step 2 (Feature-list)
 
 ### Step 2-1: Stripe Payment Integration
-- [ ] Implement Stripe Payment API integration (/config)
-- [ ] Create Order related entities
-- [ ] Create Payment related entities
-- [ ] Place order functionality
-  - [ ] Decrease product option stock on successful payment
-  - [ ] Remove ordered items from user's cart (if it exists)
-  - [ ] Handle payment failures with clear error messages  (expired session, invalid payment method, insufficient balance, etc.)
-- [ ] Payment error handling for declined payments (using Stripe test cards)
+- [x] Create Order related entities (Order, OrderItem, OrderStatus, PaymentStatus)
+- [x] Create Payment related entities (Payment, PaymentMethod)  
+- [x] Basic order creation workflow (CheckoutController, OrderService)
+- [x] Cart-based order placement (CreateOrderRequest with cartItemIds)
+- [x] Order validation (cart ownership, stock availability)
+- [x] Stock management methods (updateProductStock, clearCartItems)
+- [x] Implement Stripe Payment API integration (/config)
+  - [x] StripeProperties configuration class
+  - [x] StripeClient for API calls
+  - [x] Enable configuration properties in Application
+- [x] Connect payment flow to order creation
+  - [x] Create payment intent before order creation
+  - [x] Handle payment confirmation/failure
+  - [x] Integrate stock decrease on successful payment
+  - [x] Integrate cart cleanup on successful payment
 
 ### Step 2-2: Orders Management
-- [ ] Implement Orders API endpoints
-- [ ] Display order information:
-    - [] (mandatory) Order date and time, Order status, Purchased items, Checkout session Id (issued by stripe), Payment amount
+- [x] Implement Orders API endpoints
+- [x] Display order information:
+    - [x] (mandatory) Order date and time, Order status, Purchased items, Checkout session Id (issued by stripe), Payment amount
     - [] (optional) other payment-related fields
-- [ ] Design database schema for orders and payments
+- [x] Design database schema for orders and payments
 
 ### Step 2-3: Deployment
 - [ ] Create automated deployment script
@@ -118,38 +125,3 @@ src/main/kotlin/ecommerce/
     * A shopping cart linked to a `Member`.
 * **`CartItem`**: 
     * An item within a `Cart`, linked to a specific `ProductOption` and tracking the quantity.
-
-
-### Step 2-1: Stripe Payment Integration
-- [ ] Implement Stripe Payment API integration (/config)
-    - [ ] class `StripeProperties(val secretKey: String)`
-    - [ ] class `StripeClient(private val stripePropierties)`
-- [ ] Create Order related entities
-    - [ ] class `CreateOrderRequest(val customerName, val customerEmail, val items)`
-- [ ] Create Payment related entities
-    - [ ] class `CreatePaymentIntentRequest(val orderId: Long)`
-    - [ ] class `CreatePaymentIntentResponse(val clientSecret: String)`
-- [ ] Place order functionality
-    - [ ] Decrease product option stock on successful payment
-    - [ ] Remove ordered items from user's cart (if it exists)
-    - [ ] Handle payment failures with clear error messages  (expired session, invalid payment method, insufficient balance, etc.)
-        - [ ] add annotation to `Application` : `@EnableConfigurationProperties(StripeProperties::class)`
-        - [ ] class `OrderController` contains
-            - [ ] `createOrder`, `getOrder`, `createPaymentIntent`
-        - [ ] class `OrderService`, `OrderRepository`, `OrderStatus` 
-        - [ ] add your db and stripe credentials `resources/application.properties`
-- [ ] Payment error handling for declined payments (using Stripe test cards)
-
-### Step 2-2: Orders Management
-- [ ] Implement Orders API endpoints
-- [ ] Display order information:
-    - [] (mandatory) Order date and time, Order status, Purchased items, Checkout session Id (issued by stripe), Payment amount
-    - [] (optional) other payment-related fields
-- [ ] Design database schema for orders and payments
-
-### Step 2-3: Deployment
-- [ ] Create automated deployment script
-- [ ] Configure CORS for client-server interaction (?)
-- [ ] Handle security considerations for production deployment
-    - [] for example, when server and client have different `Origin` values
-- [] (optional) implement `HTTPS`
