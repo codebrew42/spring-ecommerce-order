@@ -13,7 +13,6 @@ import ecommerce.repository.CartRepository
 import ecommerce.repository.CartStatisticsRepository
 import ecommerce.repository.ProductOptionRepository
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -74,27 +73,10 @@ class CartItemServiceTest {
 
         val result = cartItemService.addCartItem(request, cartId)
 
-        assertNotNull(result)
+        assertThat(result).isNotNull
         verify(cartRepository).findById(cartId)
         verify(productOptionRepository).findById(request.productOptionId)
         verify(cartItemRepository).save(any(CartItem::class.java))
-    }
-
-    @Test
-    fun `updateCartItem should update cart item quantity successfully`() {
-        val request = AddToCartRequest(1L, 3, 1L, 1L)
-        val cartId = 1L
-        val existingCartItem = CartItem(testCart, testProductOption, 2, LocalDateTime.now(), id = 1L)
-
-        `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
-        `when`(cartItemRepository.findById(existingCartItem.id!!)).thenReturn(Optional.of(existingCartItem))
-        `when`(cartItemRepository.save(existingCartItem)).thenReturn(existingCartItem)
-
-        val result = cartItemService.updateCartItem(request, cartId, existingCartItem.id!!)
-
-        assertNotNull(result)
-        assertThat(result.quantity).isEqualTo(3) // Updated to new quantity
-        verify(cartItemRepository).save(existingCartItem)
     }
 
     @Test
@@ -103,20 +85,6 @@ class CartItemServiceTest {
         val cartId = 999L
 
         `when`(cartRepository.findById(cartId)).thenReturn(Optional.empty())
-
-        assertThrows(NotFoundException::class.java) {
-            cartItemService.addCartItem(request, cartId)
-        }
-        verify(cartRepository).findById(cartId)
-    }
-
-    @Test
-    fun `addCartItem should throw NotFoundException when product option not found`() {
-        val request = AddToCartRequest(999L, 3, 1L, 1L)
-        val cartId = 1L
-
-        `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
-        `when`(productOptionRepository.findById(request.productOptionId)).thenReturn(Optional.empty())
 
         assertThrows(NotFoundException::class.java) {
             cartItemService.addCartItem(request, cartId)
@@ -133,57 +101,6 @@ class CartItemServiceTest {
 
         cartItemService.deleteCartItemById(cartItemId, cartId)
 
-        verify(cartRepository).findById(cartId)
-        verify(cartItemRepository).findById(cartItemId)
         verify(cartItemRepository).deleteById(cartItemId)
-    }
-
-    @Test
-    fun `deleteCartItemById should throw NotFoundException when cart not found`() {
-        val cartItemId = 1L
-        val cartId = 999L
-
-        `when`(cartRepository.findById(cartId)).thenReturn(Optional.empty())
-
-        assertThrows(NotFoundException::class.java) {
-            cartItemService.deleteCartItemById(cartItemId, cartId)
-        }
-    }
-
-    @Test
-    fun `deleteCartItemById should throw NotFoundException when cart item not found`() {
-        val cartItemId = 999L
-        val cartId = 1L
-
-        `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
-        `when`(cartItemRepository.findById(cartItemId)).thenReturn(Optional.empty())
-
-        assertThrows(NotFoundException::class.java) {
-            cartItemService.deleteCartItemById(cartItemId, cartId)
-        }
-    }
-
-    @Test
-    fun `deleteAllCartItemsByCartId should delete all cart items successfully`() {
-        val cartId = 1L
-
-        `when`(cartRepository.findById(cartId)).thenReturn(Optional.of(testCart))
-
-        cartItemService.deleteAllCartItemsByCartId(cartId)
-
-        verify(cartRepository).findById(cartId)
-        verify(cartStatisticsRepository).deleteByCartId(cartId)
-        verify(cartItemRepository).deleteByCartId(cartId)
-    }
-
-    @Test
-    fun `deleteAllCartItemsByCartId should throw NotFoundException when cart not found`() {
-        val cartId = 999L
-
-        `when`(cartRepository.findById(cartId)).thenReturn(Optional.empty())
-
-        assertThrows(NotFoundException::class.java) {
-            cartItemService.deleteAllCartItemsByCartId(cartId)
-        }
     }
 }

@@ -16,7 +16,7 @@ import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.OrderRepository
 import ecommerce.repository.ProductOptionRepository
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -81,7 +81,7 @@ class OrderServiceStockTest {
         // Given
         val initialStock = 10
         val orderedQuantity = 3
-        assertEquals(initialStock, productOption.quantity)
+        assertThat(productOption.quantity).isEqualTo(initialStock)
 
         `when`(orderRepository.findById(1L)).thenReturn(Optional.of(order))
         `when`(orderRepository.save(any())).thenReturn(order)
@@ -91,7 +91,7 @@ class OrderServiceStockTest {
         orderService.confirmOrderPayment(1L)
 
         // Then
-        assertEquals(initialStock - orderedQuantity, productOption.quantity)
+        assertThat(productOption.quantity).isEqualTo(initialStock - orderedQuantity)
         verify(productOptionRepository).save(productOption)
     }
 
@@ -127,7 +127,7 @@ class OrderServiceStockTest {
         orderService.confirmOrderPayment(1L)
 
         // Then
-        assertEquals(3, cartItemWithHighQuantity.quantity) // 5 - 2 = 3
+        assertThat(cartItemWithHighQuantity.quantity).isEqualTo(3) // 5 - 2 = 3
         verify(cartItemRepository).save(cartItemWithHighQuantity)
     }
 }

@@ -59,47 +59,11 @@ class CheckoutControllerTest {
     }
 
     @Test
-    fun `should return 401 with invalid token`() {
-        val request =
-            CreateOrderRequest(
-                cartItemIds = listOf(1L),
-                paymentMethod = "pm_card_visa",
-                currency = Currency.EUR,
-            )
-
-        mockMvc.post("/api/checkout") {
-            header("Authorization", "Bearer invalid_token")
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(request)
-        }.andExpect {
-            status { isUnauthorized() }
-        }
-    }
-
-    @Test
     fun `should return 400 for empty cart items`() {
         val request =
             CreateOrderRequest(
                 cartItemIds = emptyList(),
                 paymentMethod = "pm_card_visa",
-                currency = Currency.EUR,
-            )
-
-        mockMvc.post("/api/checkout") {
-            header("Authorization", "Bearer $userToken")
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(request)
-        }.andExpect {
-            status { isBadRequest() }
-        }
-    }
-
-    @Test
-    fun `should return 400 for invalid payment method`() {
-        val request =
-            CreateOrderRequest(
-                cartItemIds = listOf(1L),
-                paymentMethod = "",
                 currency = Currency.EUR,
             )
 

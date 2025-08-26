@@ -12,7 +12,7 @@ import ecommerce.model.OrderStatus
 import ecommerce.model.Product
 import ecommerce.model.ProductOption
 import ecommerce.model.Role
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -73,13 +73,13 @@ class PaymentServiceTest {
         val result = paymentService.processPayment(paymentIntentRequest, order)
 
         // Then
-        assertEquals("cs_test_123", result.id)
-        assertEquals(1L, result.orderId)
-        assertEquals("PENDING", result.orderStatus)
-        assertEquals(5998, result.amount) // Stripe expects cents
-        assertEquals("eur", result.currency)
-        assertEquals(1, result.items.size)
-        assertEquals("cs_test_123", order.stripeCheckoutSessionId)
+        assertThat(result.id).isEqualTo("cs_test_123")
+        assertThat(result.orderId).isEqualTo(1L)
+        assertThat(result.orderStatus).isEqualTo("PENDING")
+        assertThat(result.amount).isEqualTo(5998) // Stripe expects cents
+        assertThat(result.currency).isEqualTo("eur")
+        assertThat(result.items.size).isEqualTo(1)
+        assertThat(order.stripeCheckoutSessionId).isEqualTo("cs_test_123")
     }
 
     @Test
@@ -115,10 +115,10 @@ class PaymentServiceTest {
         val result = paymentService.processPayment(paymentIntentRequest, order)
 
         // Then
-        assertEquals(1L, result.orderId)
-        assertEquals(OrderStatus.PENDING.name, result.orderStatus)
-        assertEquals((order.totalAmount * 100).toInt(), result.amount)
-        assertEquals(Currency.EUR.name.lowercase(), result.currency)
-        assertEquals(1, result.items.size)
+        assertThat(result.orderId).isEqualTo(1L)
+        assertThat(result.orderStatus).isEqualTo(OrderStatus.PENDING.name)
+        assertThat(result.amount).isEqualTo((order.totalAmount * 100).toInt())
+        assertThat(result.currency).isEqualTo(Currency.EUR.name.lowercase())
+        assertThat(result.items.size).isEqualTo(1)
     }
 }

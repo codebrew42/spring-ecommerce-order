@@ -17,7 +17,7 @@ import ecommerce.repository.CartRepository
 import ecommerce.repository.MemberRepository
 import ecommerce.repository.OrderRepository
 import ecommerce.repository.ProductOptionRepository
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -92,10 +92,10 @@ class OrderServiceTest {
         val result = orderService.createOrder(request, 1L)
 
         // Then
-        assertEquals(member, result.member)
-        assertEquals(Currency.EUR, result.currency)
-        assertEquals(OrderStatus.PENDING, result.orderStatus)
-        assertEquals(PaymentStatus.PENDING, result.paymentStatus)
+        assertThat(result.member).isEqualTo(member)
+        assertThat(result.currency).isEqualTo(Currency.EUR)
+        assertThat(result.orderStatus).isEqualTo(OrderStatus.PENDING)
+        assertThat(result.paymentStatus).isEqualTo(PaymentStatus.PENDING)
         verify(orderRepository).save(any())
     }
 
@@ -153,8 +153,8 @@ class OrderServiceTest {
         val result = orderService.confirmOrderPayment(1L)
 
         // Then
-        assertEquals(OrderStatus.CONFIRMED, result.orderStatus)
-        assertEquals(PaymentStatus.COMPLETED, result.paymentStatus)
+        assertThat(result.orderStatus).isEqualTo(OrderStatus.CONFIRMED)
+        assertThat(result.paymentStatus).isEqualTo(PaymentStatus.COMPLETED)
         verify(orderRepository).save(order)
     }
 }
