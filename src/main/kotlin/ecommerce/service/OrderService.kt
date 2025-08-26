@@ -1,28 +1,22 @@
-// package ecommerce.service
-//
-// import ecommerce.config.StripeClient
-// import ecommerce.dto.order.OrderRequest
-// import ecommerce.dto.payment.PaymentIntentRequest
-// import ecommerce.exception.NotFoundException
-// import ecommerce.model.*
-// import ecommerce.repository.*
-// import org.springframework.data.domain.Page
-// import org.springframework.data.domain.PageRequest
-// import org.springframework.data.domain.Pageable
-// import org.springframework.data.repository.findByIdOrNull
-// import org.springframework.http.ResponseEntity
-// import org.springframework.stereotype.Service
-// import org.springframework.transaction.annotation.Transactional
-//
-// @Service
-// class OrderService(
+package ecommerce.service
+
+import org.springframework.stereotype.Service
+@Service
+class OrderService() {
+
+}
+
+
+/*
+@Service
+class OrderService(
 //    private val orderRepository: OrderRepository,
 //    private val memberRepository: MemberRepository,
 //    private val productOptionRepository: ProductOptionRepository,
 //    private val cartRepository: CartRepository,
 //    private val cartItemRepository: CartItemRepository,
 //    private val stripeClient: StripeClient,
-// ) {
+) {
 //    fun findAllOrders(pageable: Pageable): Page<Order> {
 //        return orderRepository.findAll(pageable)
 //    }
@@ -90,4 +84,7 @@
 // //
 //
 //
-// }
+}
+
+
+ */
