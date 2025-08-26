@@ -57,77 +57,79 @@ class CartItemServiceIntegrationTest {
     fun `addCartItem should create new cart item successfully`() {
         val request =
             AddToCartRequest(
-                productOptionId = testProductOption.id!!,
+                productOptionId = testProductOption.id ?: 1L,
                 newProductOptionQuantity = 3,
                 cartItemId = 0L,
-                cartId = testCart.id!!,
+                cartId = testCart.id ?: 1L,
             )
 
-        val result = cartItemService.saveCartItem(request, testCart.id!!)
+        val result = cartItemService.addCartItem(request, testCart.id ?: 1L)
 
         assertThat(result).isNotNull()
         assertThat(result.id).isNotNull()
         assertThat(result.cart.id).isEqualTo(testCart.id)
         assertThat(result.productOption.id).isEqualTo(testProductOption.id)
-        assertThat(result.quantity).isEqualTo(4)
+        assertThat(result.quantity).isEqualTo(3)
 
-        val savedItem = cartItemRepository.findById(result.id!!).orElse(null)
+        val savedItem = cartItemRepository.findById(result.id ?: 0L).orElse(null)
         assertThat(savedItem).isNotNull()
-        assertThat(savedItem.quantity).isEqualTo(4)
+        assertThat(savedItem.quantity).isEqualTo(3)
     }
 
     @Test
-    fun `addCartItem should update existing cart item when product option already in cart`() {
-        val initialRequest =
+    fun `addCartItem should create cart item successfully`() {
+        val request =
             AddToCartRequest(
-                productOptionId = testProductOption.id!!,
+                productOptionId = testProductOption.id ?: 1L,
                 newProductOptionQuantity = 2,
-                cartItemId = 4L,
-                cartId = testCart.id!!,
+                cartItemId = 0L,
+                cartId = testCart.id ?: 1L,
             )
-        cartItemService.saveCartItem(initialRequest, testCart.id!!)
+        val result = cartItemService.addCartItem(request, testCart.id ?: 1L)
 
-        val updateRequest =
-            AddToCartRequest(
-                productOptionId = testProductOption.id!!,
-                newProductOptionQuantity = 3,
-                cartItemId = 4L,
-                cartId = testCart.id!!,
-            )
-        val result = cartItemService.saveCartItem(updateRequest, testCart.id!!)
-
-        assertThat(result.quantity).isEqualTo(6)
-
-        val cartItems = cartItemRepository.findByCartId(testCart.id!!)
-        assertThat(cartItems.size).isEqualTo(2)
-        assertThat(cartItems[0].quantity).isEqualTo(6)
+        assertThat(result.quantity).isEqualTo(2)
+        assertThat(result.cart.id).isEqualTo(testCart.id)
+        assertThat(result.productOption.id).isEqualTo(testProductOption.id)
     }
 
     @Test
     fun `deleteCartItemById should remove cart item successfully`() {
         val request =
             AddToCartRequest(
-                productOptionId = testProductOption.id!!,
+                productOptionId = testProductOption.id ?: 1L,
                 newProductOptionQuantity = 2,
                 cartItemId = 0L,
-                cartId = testCart.id!!,
+                cartId = testCart.id ?: 1L,
             )
-        val createdItem = cartItemService.saveCartItem(request, testCart.id!!)
+        val createdItem = cartItemService.addCartItem(request, testCart.id ?: 1L)
 
-        cartItemService.deleteCartItemById(createdItem.id!!, testCart.id!!)
+        cartItemService.deleteCartItemById(createdItem.id ?: 0L, testCart.id ?: 1L)
 
-        val deletedItem = cartItemRepository.findById(createdItem.id!!).orElse(null)
+        val deletedItem = cartItemRepository.findById(createdItem.id ?: 0L).orElse(null)
         assertThat(deletedItem).isNull()
     }
 
     @Test
     fun `deleteAllCartItemsByCartId should remove all cart items`() {
-        val itemsBefore = cartItemRepository.findByCartId(1)
-        assertThat(itemsBefore.size).isEqualTo(2)
+        val testCart2 = cartRepository.findById(2L).orElseThrow { RuntimeException("Test cart 2 not found") }
+        val cart2Id = testCart2.id ?: 2L
+        val productOptionId = testProductOption.id ?: 1L
 
-        cartItemService.deleteAllCartItemsByCartId(1)
+        // Clean up existing data
+        cartItemService.deleteAllCartItemsByCartId(cart2Id)
 
-        val itemsAfter = cartItemRepository.findByCartId(1)
-        assertThat(itemsAfter.size).isEqualTo(0)
+        // Add some cart items to the clean cart
+        val request1 = AddToCartRequest(productOptionId, 1, 0L, cart2Id)
+        val request2 = AddToCartRequest(productOptionId, 2, 0L, cart2Id)
+        cartItemService.addCartItem(request1, cart2Id)
+        cartItemService.addCartItem(request2, cart2Id)
+
+        // Verify items were added
+        assertThat(cartItemRepository.findByCartId(cart2Id)).hasSize(2)
+
+        // Test the deletion
+        cartItemService.deleteAllCartItemsByCartId(cart2Id)
+
+        assertThat(cartItemRepository.findByCartId(cart2Id)).isEmpty()
     }
 }

@@ -17,6 +17,11 @@ interface CartItemRepository : JpaRepository<CartItem, Long> {
     @EntityGraph(attributePaths = ["productOption", "productOption.product"])
     fun findByCartId(cartId: Long): List<CartItem>
 
+    fun findByCartIdAndProductOptionId(
+        cartId: Long,
+        productOptionId: Long,
+    ): List<CartItem>
+
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM CartItem ci WHERE ci.cart.id = :cartId")
     fun deleteByCartId(cartId: Long)
