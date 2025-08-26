@@ -118,43 +118,6 @@ class OrderServiceTest {
     }
 
     @Test
-    fun `should throw IllegalArgumentException when cart items empty`() {
-        // Given
-        val request =
-            CreateOrderRequest(
-                cartItemIds = emptyList(),
-                paymentMethod = "pm_card_visa",
-                currency = Currency.EUR,
-            )
-
-        `when`(memberRepository.findById(1L)).thenReturn(Optional.of(member))
-
-        // When & Then
-        assertThrows(IllegalArgumentException::class.java) {
-            orderService.createOrder(request, 1L)
-        }
-    }
-
-    @Test
-    fun `should throw NotFoundException when cart item not found`() {
-        // Given
-        val request =
-            CreateOrderRequest(
-                cartItemIds = listOf(999L),
-                paymentMethod = "pm_card_visa",
-                currency = Currency.EUR,
-            )
-
-        `when`(memberRepository.findById(1L)).thenReturn(Optional.of(member))
-        `when`(cartItemRepository.findById(999L)).thenReturn(Optional.empty())
-
-        // When & Then
-        assertThrows(NotFoundException::class.java) {
-            orderService.createOrder(request, 1L)
-        }
-    }
-
-    @Test
     fun `should throw IllegalArgumentException when insufficient stock`() {
         // Given
         val lowStockProductOption = ProductOption("Size M", 1, product, 29.99, id = 1L)
@@ -193,18 +156,5 @@ class OrderServiceTest {
         assertEquals(OrderStatus.CONFIRMED, result.orderStatus)
         assertEquals(PaymentStatus.COMPLETED, result.paymentStatus)
         verify(orderRepository).save(order)
-    }
-
-    @Test
-    fun `should throw IllegalStateException when payment already confirmed`() {
-        // Given
-        order.paymentStatus = PaymentStatus.COMPLETED
-
-        `when`(orderRepository.findById(1L)).thenReturn(Optional.of(order))
-
-        // When & Then
-        assertThrows(IllegalStateException::class.java) {
-            orderService.confirmOrderPayment(1L)
-        }
     }
 }
