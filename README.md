@@ -101,13 +101,13 @@
   - [x] Add CORS configuration to WebMvcConfig
   - [x] Allow cross-origin requests from frontend
   - [x] Test CORS with OPTIONS requests
-- [ ] Handle security considerations for production deployment
+- [x] Handle security considerations for production deployment
   - [x] Set up proper logging for production
   - [x] Ensure JWT secret is environment-based (via .env file)
-  - [ ] Configure proper CORS origins (not wildcard in production)
+  - [x] Configure proper CORS origins (not wildcard in production)
 - [ ] (optional) Implement HTTPS
 - [x] Test deployment on AWS instance
-- [ ] Verify application runs correctly in production environment
+- [x] Verify application runs correctly in production environment
 
 --- 
 ## External API Integration - Step 2 (Development-plan)
