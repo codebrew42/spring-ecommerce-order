@@ -140,6 +140,24 @@ class OrderService(
             .map { it.toResponse() }
     }
 
+    fun findAllOrders(pageable: Pageable): Page<OrderResponse> {
+        return orderRepository.findAll(pageable)
+            .map { it.toResponse() }
+    }
+
+    @Transactional
+    fun deleteById(orderId: Long) {
+        val order =
+            orderRepository.findById(orderId)
+                .orElseThrow { NotFoundException("Order not found with id: $orderId") }
+
+        if (order.orderStatus == OrderStatus.CONFIRMED || order.paymentStatus == PaymentStatus.COMPLETED) {
+            throw IllegalStateException("Cannot delete confirmed or completed orders")
+        }
+
+        orderRepository.deleteById(orderId)
+    }
+
     // Private helper methods
     private fun validateOrderRequest(request: CreateOrderRequest) {
         if (request.items.isEmpty()) {
