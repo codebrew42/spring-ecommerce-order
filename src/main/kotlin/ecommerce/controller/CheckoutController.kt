@@ -36,9 +36,7 @@ class CheckoutController(
             )
 
         val checkoutResponse = paymentService.processPayment(paymentIntentRequest, order)
-
         orderService.save(order)
-
         return ResponseEntity.ok(checkoutResponse)
     }
 
