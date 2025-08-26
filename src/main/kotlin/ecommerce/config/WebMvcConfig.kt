@@ -13,7 +13,6 @@ class WebMvcConfig(
     private val authInterceptor: AuthInterceptor,
     private val authenticatedUserArgumentResolver: AuthenticatedUserArgumentResolver,
 ) : WebMvcConfigurer {
-    
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/api/**")
             .allowedOriginPatterns("*")
@@ -23,7 +22,7 @@ class WebMvcConfig(
             .exposedHeaders("Location")
             .maxAge(1800)
     }
-    
+
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(authInterceptor)
             .addPathPatterns("/api/cart/**")

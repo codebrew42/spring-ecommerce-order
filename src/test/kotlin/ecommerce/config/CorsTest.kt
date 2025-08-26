@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional
 @ActiveProfiles("test")
 @Transactional
 class CorsTest {
-    
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -26,7 +25,7 @@ class CorsTest {
         mockMvc.perform(
             options("/api/products")
                 .header(HttpHeaders.ORIGIN, "http://localhost:3000")
-                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET")
+                .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"),
         )
             .andExpect(status().isOk)
             .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:3000"))
