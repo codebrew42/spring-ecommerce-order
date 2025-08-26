@@ -31,7 +31,6 @@ import java.util.Optional
 
 @ExtendWith(MockitoExtension::class)
 class OrderServiceTest {
-
     @Mock
     private lateinit var orderRepository: OrderRepository
 
@@ -58,13 +57,14 @@ class OrderServiceTest {
 
     @BeforeEach
     fun setUp() {
-        orderService = OrderService(
-            orderRepository,
-            memberRepository,
-            productOptionRepository,
-            cartItemRepository,
-            cartRepository
-        )
+        orderService =
+            OrderService(
+                orderRepository,
+                memberRepository,
+                productOptionRepository,
+                cartItemRepository,
+                cartRepository,
+            )
 
         member = Member("test@test.com", "password", "Test User", Role.USER, id = 1L)
         product = Product("Test Product", 29.99, 10, "test.jpg", id = 1L)
@@ -77,11 +77,12 @@ class OrderServiceTest {
     @Test
     fun `should create order successfully with valid cart items`() {
         // Given
-        val request = CreateOrderRequest(
-            cartItemIds = listOf(1L),
-            paymentMethod = "pm_card_visa",
-            currency = Currency.EUR
-        )
+        val request =
+            CreateOrderRequest(
+                cartItemIds = listOf(1L),
+                paymentMethod = "pm_card_visa",
+                currency = Currency.EUR,
+            )
 
         `when`(memberRepository.findById(1L)).thenReturn(Optional.of(member))
         `when`(cartItemRepository.findById(1L)).thenReturn(Optional.of(cartItem))
@@ -101,11 +102,12 @@ class OrderServiceTest {
     @Test
     fun `should throw NotFoundException when member not found`() {
         // Given
-        val request = CreateOrderRequest(
-            cartItemIds = listOf(1L),
-            paymentMethod = "pm_card_visa",
-            currency = Currency.EUR
-        )
+        val request =
+            CreateOrderRequest(
+                cartItemIds = listOf(1L),
+                paymentMethod = "pm_card_visa",
+                currency = Currency.EUR,
+            )
 
         `when`(memberRepository.findById(1L)).thenReturn(Optional.empty())
 
@@ -118,11 +120,12 @@ class OrderServiceTest {
     @Test
     fun `should throw IllegalArgumentException when cart items empty`() {
         // Given
-        val request = CreateOrderRequest(
-            cartItemIds = emptyList(),
-            paymentMethod = "pm_card_visa",
-            currency = Currency.EUR
-        )
+        val request =
+            CreateOrderRequest(
+                cartItemIds = emptyList(),
+                paymentMethod = "pm_card_visa",
+                currency = Currency.EUR,
+            )
 
         `when`(memberRepository.findById(1L)).thenReturn(Optional.of(member))
 
@@ -135,11 +138,12 @@ class OrderServiceTest {
     @Test
     fun `should throw NotFoundException when cart item not found`() {
         // Given
-        val request = CreateOrderRequest(
-            cartItemIds = listOf(999L),
-            paymentMethod = "pm_card_visa",
-            currency = Currency.EUR
-        )
+        val request =
+            CreateOrderRequest(
+                cartItemIds = listOf(999L),
+                paymentMethod = "pm_card_visa",
+                currency = Currency.EUR,
+            )
 
         `when`(memberRepository.findById(1L)).thenReturn(Optional.of(member))
         `when`(cartItemRepository.findById(999L)).thenReturn(Optional.empty())
@@ -156,11 +160,12 @@ class OrderServiceTest {
         val lowStockProductOption = ProductOption("Size M", 1, product, 29.99, id = 1L)
         val cartItemWithHighQuantity = CartItem(cart, lowStockProductOption, 5, id = 1L)
 
-        val request = CreateOrderRequest(
-            cartItemIds = listOf(1L),
-            paymentMethod = "pm_card_visa",
-            currency = Currency.EUR
-        )
+        val request =
+            CreateOrderRequest(
+                cartItemIds = listOf(1L),
+                paymentMethod = "pm_card_visa",
+                currency = Currency.EUR,
+            )
 
         `when`(memberRepository.findById(1L)).thenReturn(Optional.of(member))
         `when`(cartItemRepository.findById(1L)).thenReturn(Optional.of(cartItemWithHighQuantity))

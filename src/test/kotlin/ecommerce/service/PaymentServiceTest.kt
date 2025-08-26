@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension
 
 @ExtendWith(MockitoExtension::class)
 class PaymentServiceTest {
-
     @Mock
     private lateinit var stripeClient: StripeClient
 
@@ -39,32 +38,34 @@ class PaymentServiceTest {
         val member = Member("test@test.com", "password", "Test User", Role.USER, id = 1L)
         val product = Product("Test Product", 29.99, 10, "test.jpg", id = 1L)
         val productOption = ProductOption("Size M", 10, product, 29.99, id = 1L)
-        
+
         order = Order(member, currency = Currency.EUR, id = 1L)
         val orderItem = OrderItem.fromProductOption(productOption, 2, order)
         order.addOrderItem(orderItem)
 
-        paymentIntentRequest = PaymentIntentRequest(
-            amount = 59.98,
-            currency = Currency.EUR,
-            paymentMethod = "pm_card_visa"
-        )
+        paymentIntentRequest =
+            PaymentIntentRequest(
+                amount = 59.98,
+                currency = Currency.EUR,
+                paymentMethod = "pm_card_visa",
+            )
     }
 
     @Test
     fun `should process payment successfully`() {
         // Given
-        val stripeResponse = CheckoutResponse(
-            id = "cs_test_123",
-            client_secret = "cs_test_123_secret",
-            amount = 5998,
-            currency = "eur",
-            status = "open",
-            payment_method = null,
-            orderId = 1L,
-            orderStatus = "PENDING",
-            items = emptyList()
-        )
+        val stripeResponse =
+            CheckoutResponse(
+                id = "cs_test_123",
+                client_secret = "cs_test_123_secret",
+                amount = 5998,
+                currency = "eur",
+                status = "open",
+                payment_method = null,
+                orderId = 1L,
+                orderStatus = "PENDING",
+                items = emptyList(),
+            )
 
         `when`(stripeClient.createCheckoutSession(paymentIntentRequest)).thenReturn(stripeResponse)
 
@@ -95,17 +96,18 @@ class PaymentServiceTest {
     @Test
     fun `should update checkout response with correct order data`() {
         // Given
-        val stripeResponse = CheckoutResponse(
-            id = "cs_test_123",
-            client_secret = null,
-            amount = 0,
-            currency = "usd",
-            status = "open",
-            payment_method = null,
-            orderId = 0L,
-            orderStatus = "CONFIRMED",
-            items = emptyList()
-        )
+        val stripeResponse =
+            CheckoutResponse(
+                id = "cs_test_123",
+                client_secret = null,
+                amount = 0,
+                currency = "usd",
+                status = "open",
+                payment_method = null,
+                orderId = 0L,
+                orderStatus = "CONFIRMED",
+                items = emptyList(),
+            )
 
         `when`(stripeClient.createCheckoutSession(paymentIntentRequest)).thenReturn(stripeResponse)
 
