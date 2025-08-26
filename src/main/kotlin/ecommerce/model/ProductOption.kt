@@ -37,7 +37,7 @@ class ProductOption(
         if (newQuantity <= this.quantity) {
             throw IllegalArgumentException(
                 "New product option quantity ($newQuantity) " +
-                    "must be greater than current quantity (${this.quantity})",
+                        "must be greater than current quantity (${this.quantity})",
             )
         }
     }
