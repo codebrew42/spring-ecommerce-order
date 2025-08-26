@@ -1,7 +1,7 @@
 package ecommerce.config
 
+import ecommerce.auth.AuthenticatedUserArgumentResolver
 import ecommerce.interceptor.AuthInterceptor
-import ecommerce.resolver.AuthenticatedUserArgumentResolver
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
