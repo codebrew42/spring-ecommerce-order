@@ -1,0 +1,79 @@
+package ecommerce.controller
+
+import ecommerce.config.StripeClient
+import ecommerce.dto.auth.AuthenticatedUser
+import ecommerce.dto.checkout.CheckoutResponse
+import ecommerce.dto.order.CreateOrderRequest
+import ecommerce.dto.order.toResponse
+import ecommerce.dto.payment.PaymentIntentRequest
+import ecommerce.exception.FailedPaymentException
+import ecommerce.service.OrderService
+import ecommerce.service.PaymentService
+import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+
+@RequestMapping("/api/checkout")
+@RestController
+class CheckoutController(
+    private val orderService: OrderService,
+    private val paymentService: PaymentService,
+    private val stripeClient: StripeClient,
+) {
+    @PostMapping
+    fun createOrder(
+        @Valid @RequestBody request: CreateOrderRequest,
+        user: AuthenticatedUser,
+    ): ResponseEntity<CheckoutResponse> {
+        val order = orderService.createOrder(request, user.userId)
+
+        val paymentIntentRequest =
+            PaymentIntentRequest(
+                amount = order.totalAmount,
+                currency = order.currency,
+                paymentMethod = request.paymentMethod,
+            )
+
+        val stripeResponse =
+            stripeClient.createCheckoutSession(paymentIntentRequest)
+                ?: throw FailedPaymentException("Failed to create Stripe PaymentIntent")
+
+        val checkoutResponse = paymentService.createPaymentIntent(paymentIntentRequest)
+
+        return ResponseEntity.ok(checkoutResponse)
+    }
+
+    @PostMapping("/confirm/{orderId}")
+    fun confirmCheckout(
+        @PathVariable orderId: Long,
+        user: AuthenticatedUser,
+    ): ResponseEntity<CheckoutResponse> {
+        val order = orderService.getById(orderId)
+
+        if (order.member.id != user.userId) {
+            throw IllegalArgumentException("Order does not belong to member")
+        }
+
+        orderService.confirmOrderPayment(orderId)
+
+        val updatedOrder = orderService.getById(orderId)
+        val response =
+            CheckoutResponse(
+                id = "pi_confirmed_${updatedOrder.id}",
+                client_secret = null,
+                amount = (updatedOrder.totalAmount * 100).toInt(),
+                currency = updatedOrder.currency.name.lowercase(),
+                status = "succeeded",
+                payment_method = null,
+                orderId = updatedOrder.id ?: 0L,
+                orderStatus = updatedOrder.orderStatus.name,
+                items = updatedOrder.toResponse().orderItems,
+            )
+
+        return ResponseEntity.ok(response)
+    }
+}
