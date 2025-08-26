@@ -14,7 +14,7 @@ data class CreateProductRequest(
         regexp = "^[a-zA-Z0-9 ()\\[\\]+\\-&/_]{1,100}$",
         message =
             "Name must be 1–15 characters and only include letters, digits, spaces, " +
-                "and allowed special characters:( ), [ ], +, -, &, /, _",
+                    "and allowed special characters:( ), [ ], +, -, &, /, _",
     )
     val name: String,
     @field:NotNull(message = "Price must not be null")
@@ -42,7 +42,7 @@ data class UpdateProductRequest(
         regexp = "^[a-zA-Z0-9 ()\\[\\]+\\-&/_]{1,100}$",
         message =
             "Name must be 1–15 characters and only include letters, digits, spaces, " +
-                "and allowed special characters:( ), [ ], +, -, &, /, _",
+                    "and allowed special characters:( ), [ ], +, -, &, /, _",
     )
     val name: String,
     @field:NotNull(message = "Price must not be null")
@@ -67,13 +67,15 @@ data class ProductOptionRequest(
         regexp = "^[a-zA-Z0-9 ()\\[\\]+\\-&/_]{1,100}$",
         message =
             "Name must be 1–50 characters and only include letters, digits, spaces, " +
-                "and allowed special characters:( ), [ ], +, -, &, /, _",
+                    "and allowed special characters:( ), [ ], +, -, &, /, _",
     )
     val name: String,
     @field:NotNull(message = "quantity must not be null")
     @field:Min(1, message = "quantity must be greater than 0")
     @field:Max(99999999, message = "quantity must be lesser than 100,000,000")
     val quantity: Int,
+    @field:NotNull(message = "Price must not be empty")
+    var price: Double,
     @field:NotNull(message = "Product must not be blank")
     var productId: Long,
 )
@@ -84,7 +86,7 @@ data class ProductPatchRequest(
         regexp = "^[a-zA-Z0-9 ()\\[\\]+\\-&/_]{1,100}$",
         message =
             "Name must be 1–15 characters and only include letters, digits, spaces, " +
-                "and allowed special characters:( ), [ ], +, -, &, /, _",
+                    "and allowed special characters:( ), [ ], +, -, &, /, _",
     )
     val name: String? = null,
     @field:Min(1, message = "Price must be greater than 0")

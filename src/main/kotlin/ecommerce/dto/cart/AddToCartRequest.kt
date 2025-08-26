@@ -7,8 +7,7 @@ data class AddToCartRequest(
     val productOptionId: Long,
     @field:NotNull(message = "Quantity is required")
     val newProductOptionQuantity: Int,
-    @field:NotNull(message = "Cart item is required")
-    val cartItemId: Long,
+    val cartItemId: Long?,
     @field:NotNull(message = "Cart is required")
     val cartId: Long,
 )
