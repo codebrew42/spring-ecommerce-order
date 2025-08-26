@@ -69,6 +69,11 @@ class OrderService(
             .orElseThrow { NotFoundException("Order not found with id: $id") }
     }
 
+    @Transactional
+    fun save(order: Order): Order {
+        return orderRepository.save(order)
+    }
+
     fun getOrdersByMember(
         memberId: Long,
         pageable: Pageable,

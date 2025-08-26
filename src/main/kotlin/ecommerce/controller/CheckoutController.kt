@@ -1,13 +1,10 @@
 package ecommerce.controller
 
-import ecommerce.config.StripeClient
 import ecommerce.dto.auth.AuthenticatedUser
 import ecommerce.dto.checkout.CheckoutResponse
 import ecommerce.dto.order.CreateOrderRequest
 import ecommerce.dto.order.toResponse
 import ecommerce.dto.payment.PaymentIntentRequest
-import ecommerce.exception.FailedPaymentException
-import ecommerce.model.OrderStatus
 import ecommerce.service.OrderService
 import ecommerce.service.PaymentService
 import jakarta.validation.Valid
@@ -23,10 +20,9 @@ import org.springframework.web.bind.annotation.RestController
 class CheckoutController(
     private val orderService: OrderService,
     private val paymentService: PaymentService,
-    private val stripeClient: StripeClient,
 ) {
     @PostMapping
-    fun createOrder(
+    fun processCheckout(
         @Valid @RequestBody request: CreateOrderRequest,
         user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
@@ -39,19 +35,9 @@ class CheckoutController(
                 paymentMethod = request.paymentMethod,
             )
 
-        val stripeResponse =
-            stripeClient.createCheckoutSession(paymentIntentRequest)
-                ?: throw FailedPaymentException("Failed to create Stripe PaymentIntent")
+        val checkoutResponse = paymentService.processPayment(paymentIntentRequest, order)
 
-        val checkoutResponse =
-            try {
-                paymentService.createPaymentIntent(paymentIntentRequest)
-            } catch (_: FailedPaymentException) {
-                throw FailedPaymentException("Payment failed.")
-            }
-        order.orderStatus = OrderStatus.CONFIRMED
-        order.stripeCheckoutSessionId = checkoutResponse.id
-
+        orderService.save(order)
 
         return ResponseEntity.ok(checkoutResponse)
     }
