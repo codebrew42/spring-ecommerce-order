@@ -2,7 +2,7 @@ package ecommerce.dto.payment
 
 import ecommerce.model.Currency
 
-data class PaymentStatusResponse(
+data class PaymentResponse(
     val paymentIntentId: String,
     val status: String,
     val amount: Double,

@@ -3,7 +3,7 @@ package ecommerce.service
 import ecommerce.config.StripeClient
 import ecommerce.dto.checkout.CheckoutResponse
 import ecommerce.dto.payment.PaymentIntentRequest
-import ecommerce.dto.payment.PaymentStatusResponse
+import ecommerce.dto.payment.PaymentResponse
 import ecommerce.exception.FailedPaymentException
 import ecommerce.exception.NotFoundException
 import ecommerce.model.Payment
@@ -22,12 +22,12 @@ class PaymentService(
             ?: throw FailedPaymentException("Failed to create payment intent with Stripe")
     }
 
-    fun getPaymentStatus(stripePaymentIntentId: String): PaymentStatusResponse {
+    fun getPaymentStatus(stripePaymentIntentId: String): PaymentResponse {
         val payment =
             paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
                 ?: throw NotFoundException("Payment not found for payment intent: $stripePaymentIntentId")
 
-        return PaymentStatusResponse(
+        return PaymentResponse(
             paymentIntentId = payment.stripePaymentIntentId,
             status = payment.status.name,
             amount = payment.amount,
