@@ -14,23 +14,4 @@ interface OrderRepository : JpaRepository<Order, Long> {
         memberId: Long,
         pageable: Pageable,
     ): Page<Order>
-
-    fun findByMemberIdAndOrderStatus(
-        memberId: Long,
-        orderStatus: OrderStatus,
-        pageable: Pageable,
-    ): Page<Order>
-
-    fun findByStripeCheckoutSessionId(stripeCheckoutSessionId: String): Order?
-
-    fun findByStripePaymentIntentId(stripePaymentIntentId: String): Order?
-
-    @Query(
-        """
-        SELECT o FROM Order o 
-        WHERE o.member.id = :memberId 
-        ORDER BY o.createdAt DESC
-    """,
-    )
-    fun findByMemberIdOrderByCreatedAtDesc(memberId: Long): List<Order>
 }

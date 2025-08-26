@@ -3,7 +3,9 @@ package ecommerce.repository
 import ecommerce.model.Cart
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
+import org.springframework.stereotype.Repository
 
+@Repository
 interface CartRepository : JpaRepository<Cart, Long> {
     fun findByMemberId(memberId: Long): Cart?
 
@@ -12,6 +14,5 @@ interface CartRepository : JpaRepository<Cart, Long> {
         memberId: Long,
     ): Cart?
 
-    @Modifying
     fun deleteByMemberId(memberId: Long)
 }
