@@ -114,20 +114,20 @@ class CartItemServiceIntegrationTest {
         val testCart2 = cartRepository.findById(2L).orElseThrow { RuntimeException("Test cart 2 not found") }
         val cart2Id = testCart2.id ?: 2L
         val productOptionId = testProductOption.id ?: 1L
-        
-        // Clean up existing data first
+
+        // Clean up existing data
         cartItemService.deleteAllCartItemsByCartId(cart2Id)
-        
+
         // Add some cart items to the clean cart
         val request1 = AddToCartRequest(productOptionId, 1, 0L, cart2Id)
         val request2 = AddToCartRequest(productOptionId, 2, 0L, cart2Id)
         cartItemService.addCartItem(request1, cart2Id)
         cartItemService.addCartItem(request2, cart2Id)
-        
+
         // Verify items were added
         assertThat(cartItemRepository.findByCartId(cart2Id)).hasSize(2)
-        
-        // Now test the deletion
+
+        // Test the deletion
         cartItemService.deleteAllCartItemsByCartId(cart2Id)
 
         assertThat(cartItemRepository.findByCartId(cart2Id)).isEmpty()

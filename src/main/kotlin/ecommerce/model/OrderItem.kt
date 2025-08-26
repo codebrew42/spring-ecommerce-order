@@ -28,6 +28,11 @@ class OrderItem(
     var unitPrice: Double,
     @Column(name = "total_price", nullable = false)
     var totalPrice: Double,
+    // Historical tracking - store product and option names at time of order
+    @Column(name = "product_name", nullable = false)
+    val productName: String,
+    @Column(name = "option_name", nullable = false)
+    val optionName: String,
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,
@@ -38,9 +43,21 @@ class OrderItem(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
+    init {
+        this.totalPrice = calculateTotalPrice()
+    }
+
     fun getTotalAmount(): Double {
-        totalPrice = quantity * unitPrice
         return totalPrice
+    }
+
+    fun calculateTotalPrice(): Double {
+        return quantity * unitPrice
+    }
+
+    fun updateQuantity(newQuantity: Int) {
+        this.quantity = newQuantity
+        this.totalPrice = calculateTotalPrice()
     }
 
     override fun equals(other: Any?): Boolean {
@@ -54,6 +71,39 @@ class OrderItem(
     }
 
     override fun toString(): String {
-        return "OrderItem(id=$id, productOptionId=${productOption.id}, quantity=$quantity, unitPrice=$unitPrice)"
+        return "OrderItem(id=$id, productName='$productName', optionName='$optionName', quantity=$quantity, unitPrice=$unitPrice)"
+    }
+
+    companion object {
+        fun fromCartItem(
+            cartItem: CartItem,
+            order: Order,
+        ): OrderItem {
+            return OrderItem(
+                order = order,
+                productOption = cartItem.productOption,
+                quantity = cartItem.quantity,
+                unitPrice = cartItem.productOption.price,
+                totalPrice = cartItem.quantity * cartItem.productOption.price,
+                productName = cartItem.productOption.product.name,
+                optionName = cartItem.productOption.name,
+            )
+        }
+
+        fun fromProductOption(
+            productOption: ProductOption,
+            quantity: Int,
+            order: Order,
+        ): OrderItem {
+            return OrderItem(
+                order = order,
+                productOption = productOption,
+                quantity = quantity,
+                unitPrice = productOption.price,
+                totalPrice = quantity * productOption.price,
+                productName = productOption.product.name,
+                optionName = productOption.name,
+            )
+        }
     }
 }

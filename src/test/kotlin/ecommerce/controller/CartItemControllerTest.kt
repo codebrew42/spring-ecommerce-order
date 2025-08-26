@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
@@ -60,12 +59,13 @@ class CartItemControllerTest {
 
     @Test
     fun `cart item should be added to cart`() {
-        val addToCartRequest = AddToCartRequest(
-            productOptionId = 2,
-            newProductOptionQuantity = 7,
-            cartItemId = 3,
-            cartId = 1,
-        )
+        val addToCartRequest =
+            AddToCartRequest(
+                productOptionId = 2,
+                newProductOptionQuantity = 7,
+                cartItemId = 3,
+                cartId = 1,
+            )
 
         val response = cartItemController.addToCart(1, addToCartRequest)
 

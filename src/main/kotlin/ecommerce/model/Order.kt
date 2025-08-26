@@ -12,6 +12,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -23,15 +24,25 @@ class Order(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
-    @Column(name = "stripe_checkout_session_id", nullable = false)
-    val stripeCheckoutSessionId: String,
+    @Column(name = "stripe_checkout_session_id", nullable = true)
+    val stripeCheckoutSessionId: String? = null,
+    @Column(name = "stripe_payment_intent_id", nullable = true)
+    val stripePaymentIntentId: String? = null,
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
-    val orderStatus: OrderStatus,
-    @Column(name = "total_amount")
-    var totalAmount: Double? = null,
+    var orderStatus: OrderStatus = OrderStatus.PENDING,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    var paymentStatus: PaymentStatus = PaymentStatus.PENDING,
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency", nullable = false)
+    val currency: Currency,
+    @Column(name = "total_amount", nullable = false)
+    var totalAmount: Double = 0.0,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val orderItems: MutableList<OrderItem> = mutableListOf(),
+    @OneToOne(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    var payment: Payment? = null,
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,
@@ -42,10 +53,32 @@ class Order(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun getTotalAmount(): Double {
-        return orderItems.sumOf {
-            it.getTotalAmount()
-        }
+    fun calculateTotalAmount(): Double {
+        totalAmount = orderItems.sumOf { it.getTotalAmount() }
+        return totalAmount
+    }
+
+    fun addOrderItem(orderItem: OrderItem) {
+        orderItems.add(orderItem)
+        calculateTotalAmount()
+    }
+
+    fun confirmPayment(stripePaymentIntentId: String) {
+        this.paymentStatus = PaymentStatus.COMPLETED
+        this.orderStatus = OrderStatus.CONFIRMED
+        // Update the payment entity if it exists
+        payment?.markAsCompleted(stripePaymentIntentId, payment!!.paymentMethod ?: "unknown")
+    }
+
+    fun failPayment(reason: String? = null) {
+        this.paymentStatus = PaymentStatus.FAILED
+        this.orderStatus = OrderStatus.CANCELLED
+        // Update the payment entity if it exists
+        reason?.let { payment?.markAsFailed(it) }
+    }
+
+    fun isPaymentCompleted(): Boolean {
+        return paymentStatus == PaymentStatus.COMPLETED
     }
 
     override fun equals(other: Any?): Boolean {
@@ -59,6 +92,6 @@ class Order(
     }
 
     override fun toString(): String {
-        return "Order(id=$id, stripeCheckoutSessionId='$stripeCheckoutSessionId', status=$orderStatus)"
+        return "Order(id=$id, stripeCheckoutSessionId='$stripeCheckoutSessionId', orderStatus=$orderStatus, paymentStatus=$paymentStatus)"
     }
 }
