@@ -1,6 +1,7 @@
 package ecommerce.controller
 
 import ecommerce.dto.order.OrderResponse
+import ecommerce.dto.order.toResponse
 import ecommerce.service.OrderService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -13,11 +14,13 @@ import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/api/orders")
 @RestController
-class OrderController(private val orderService: OrderService) {
+class OrderController(
+    private val orderService: OrderService,
+) {
     @GetMapping("/{id}")
     fun getOrderById(
         @PathVariable id: Long,
-    ): OrderResponse = orderService.getOrder(id)
+    ): OrderResponse = orderService.getById(id).toResponse()
 
     @GetMapping()
     fun getOrders(pageable: Pageable): Page<OrderResponse> = orderService.findAllOrders(pageable)

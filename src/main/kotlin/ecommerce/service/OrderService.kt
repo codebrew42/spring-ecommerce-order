@@ -8,7 +8,6 @@ import ecommerce.exception.NotFoundException
 import ecommerce.model.Order
 import ecommerce.model.OrderItem
 import ecommerce.model.OrderStatus
-import ecommerce.model.PaymentMethod
 import ecommerce.model.PaymentStatus
 import ecommerce.repository.CartItemRepository
 import ecommerce.repository.CartRepository
@@ -27,22 +26,20 @@ class OrderService(
     private val productOptionRepository: ProductOptionRepository,
     private val cartItemRepository: CartItemRepository,
     private val cartRepository: CartRepository,
-    private val paymentService: PaymentService,
 ) {
     @Transactional
     fun createOrder(
         request: CreateOrderRequest,
-        memberId: Long,
+        memberId: Long?,
     ): Order {
-        // Validate member exists
+        requireNotNull(memberId) { "Member ID cannot be null" }
+
         val member =
             memberRepository.findById(memberId)
                 .orElseThrow { NotFoundException("Member not found with id: $memberId") }
 
-        // Validate order items
-        validateOrderRequest(request)
+        validateOrderRequest(request, memberId)
 
-        // Create order
         val order =
             Order(
                 member = member,
@@ -51,76 +48,23 @@ class OrderService(
                 paymentStatus = PaymentStatus.PENDING,
             )
 
-        // Create order items
-        request.items.forEach { itemRequest ->
-            val orderItem = createOrderItem(itemRequest, order)
+        request.cartItemIds.forEach { cartItemId ->
+            val cartItem =
+                cartItemRepository.findById(cartItemId)
+                    .orElseThrow { NotFoundException("Cart item not found with id: $cartItemId") }
+
+            val orderItem = createOrderItemFromCart(cartItem, order)
             order.addOrderItem(orderItem)
         }
 
-        // Calculate and set total amount
         order.calculateTotalAmount()
 
         return orderRepository.save(order)
     }
 
-    @Transactional
-    fun confirmOrder(
-        orderId: Long,
-        stripePaymentIntentId: String,
-        stripeChargeId: String,
-        paymentMethod: PaymentMethod,
-    ): Order {
-        val order =
-            orderRepository.findById(orderId)
-                .orElseThrow { NotFoundException("Order not found with id: $orderId") }
-
-        // Confirm payment
-        paymentService.confirmPayment(stripePaymentIntentId, stripeChargeId, paymentMethod)
-
-        // Update order status
-        order.orderStatus = OrderStatus.CONFIRMED
-        order.paymentStatus = PaymentStatus.COMPLETED
-
-        // Update product stock
-        updateProductStock(order)
-
-        // Clear user's cart items for ordered products
-        clearCartItems(order)
-
-        return orderRepository.save(order)
-    }
-
-    @Transactional
-    fun cancelOrder(
-        orderId: Long,
-        reason: String,
-    ): Order {
-        val order =
-            orderRepository.findById(orderId)
-                .orElseThrow { NotFoundException("Order not found with id: $orderId") }
-
-        if (!order.canBeCancelled()) {
-            throw IllegalStateException("Order cannot be cancelled in current status: ${order.orderStatus}")
-        }
-
-        // Update order status
-        order.orderStatus = OrderStatus.CANCELLED
-        order.paymentStatus = PaymentStatus.CANCELLED
-
-        // Fail payment if it exists
-        order.payment?.let { payment ->
-            paymentService.failPayment(payment.stripePaymentIntentId)
-        }
-
-        return orderRepository.save(order)
-    }
-
-    fun getOrder(orderId: Long): OrderResponse {
-        val order =
-            orderRepository.findById(orderId)
-                .orElseThrow { NotFoundException("Order not found with id: $orderId") }
-
-        return order.toResponse()
+    fun getById(id: Long): Order {
+        return orderRepository.findById(id)
+            .orElseThrow { NotFoundException("Order not found with id: $id") }
     }
 
     fun getOrdersByMember(
@@ -128,15 +72,6 @@ class OrderService(
         pageable: Pageable,
     ): Page<OrderResponse> {
         return orderRepository.findByMemberId(memberId, pageable)
-            .map { it.toResponse() }
-    }
-
-    fun getOrdersByMemberAndStatus(
-        memberId: Long,
-        status: OrderStatus,
-        pageable: Pageable,
-    ): Page<OrderResponse> {
-        return orderRepository.findByMemberIdAndOrderStatus(memberId, status, pageable)
             .map { it.toResponse() }
     }
 
@@ -158,52 +93,69 @@ class OrderService(
         orderRepository.deleteById(orderId)
     }
 
-    // Private helper methods
-    private fun validateOrderRequest(request: CreateOrderRequest) {
-        if (request.items.isEmpty()) {
-            throw IllegalArgumentException("Order must contain at least one item")
+    @Transactional
+    fun confirmOrderPayment(orderId: Long): Order {
+        val order =
+            orderRepository.findById(orderId)
+                .orElseThrow { NotFoundException("Order not found with id: $orderId") }
+
+        if (order.paymentStatus == PaymentStatus.COMPLETED) {
+            throw IllegalStateException("Payment already confirmed")
         }
 
-        if (request.customerName.isBlank()) {
-            throw IllegalArgumentException("Customer name cannot be blank")
-        }
+        order.orderStatus = OrderStatus.CONFIRMED
+        order.paymentStatus = PaymentStatus.COMPLETED
 
-        if (request.customerEmail.isBlank()) {
-            throw IllegalArgumentException("Customer email cannot be blank")
-        }
+        updateProductStock(order)
+        clearCartItems(order)
 
-        // Validate each order item
-        request.items.forEach { itemRequest ->
-            validateOrderItem(itemRequest)
-        }
+        return orderRepository.save(order)
     }
 
-    private fun validateOrderItem(itemRequest: CreateOrderItemRequest) {
-        if (itemRequest.quantity <= 0) {
-            throw IllegalArgumentException("Quantity must be positive")
+    private fun validateOrderRequest(
+        request: CreateOrderRequest,
+        memberId: Long,
+    ) {
+        if (request.cartItemIds.isEmpty()) {
+            throw IllegalArgumentException("Order must contain at least one cart item")
         }
 
-        // Check if product option exists and has sufficient stock
-        val productOption =
-            productOptionRepository.findById(itemRequest.productOptionId)
-                .orElseThrow { NotFoundException("Product option not found with id: ${itemRequest.productOptionId}") }
+        request.cartItemIds.forEach { cartItemId ->
+            val cartItem =
+                cartItemRepository.findById(cartItemId)
+                    .orElseThrow { NotFoundException("Cart item not found with id: $cartItemId") }
 
-        if (productOption.quantity < itemRequest.quantity) {
-            throw IllegalArgumentException(
-                "Insufficient stock for ${productOption.name}. Available: ${productOption.quantity}, Requested: ${itemRequest.quantity}",
-            )
+            val cartMemberId = cartItem.cart.member?.id
+            if (cartMemberId != memberId) {
+                throw IllegalArgumentException("Cart item $cartItemId does not belong to member $memberId")
+            }
+
+            if (cartItem.productOption.quantity < cartItem.quantity) {
+                throw IllegalArgumentException(
+                    "Insufficient stock for ${cartItem.productOption.name}. " +
+                        "Available: ${cartItem.productOption.quantity}, " +
+                        "Requested: ${cartItem.quantity}",
+                )
+            }
         }
     }
 
     private fun createOrderItem(
-        itemRequest: CreateOrderItemRequest,
+        request: CreateOrderItemRequest,
         order: Order,
     ): OrderItem {
         val productOption =
-            productOptionRepository.findById(itemRequest.productOptionId)
-                .orElseThrow { NotFoundException("Product option not found with id: ${itemRequest.productOptionId}") }
+            productOptionRepository.findById(request.productOptionId)
+                .orElseThrow { NotFoundException("Product option not found. id:${request.productOptionId}") }
 
-        return OrderItem.fromProductOption(productOption, itemRequest.quantity, order)
+        return OrderItem.fromProductOption(productOption, request.quantity, order)
+    }
+
+    private fun createOrderItemFromCart(
+        cartItem: ecommerce.model.CartItem,
+        order: Order,
+    ): OrderItem {
+        return OrderItem.fromProductOption(cartItem.productOption, cartItem.quantity, order)
     }
 
     private fun updateProductStock(order: Order) {
@@ -219,7 +171,6 @@ class OrderService(
         val cart = cartRepository.findByMemberId(member.id ?: 0L)
 
         if (cart != null) {
-            // Remove cart items that match ordered products
             order.orderItems.forEach { orderItem ->
                 val cartItems =
                     cartItemRepository.findByCartIdAndProductOptionId(
@@ -228,10 +179,8 @@ class OrderService(
                     )
                 cartItems.forEach { cartItem ->
                     if (cartItem.quantity <= orderItem.quantity) {
-                        // Remove entire cart item if ordered quantity >= cart quantity
                         cartItemRepository.delete(cartItem)
                     } else {
-                        // Reduce cart item quantity
                         cartItem.quantity -= orderItem.quantity
                         cartItemRepository.save(cartItem)
                     }
