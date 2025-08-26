@@ -74,6 +74,8 @@ data class ProductOptionRequest(
     @field:Min(1, message = "quantity must be greater than 0")
     @field:Max(99999999, message = "quantity must be lesser than 100,000,000")
     val quantity: Int,
+    @field:NotNull(message = "Price must not be empty")
+    var price: Double,
     @field:NotNull(message = "Product must not be blank")
     var productId: Long,
 )
