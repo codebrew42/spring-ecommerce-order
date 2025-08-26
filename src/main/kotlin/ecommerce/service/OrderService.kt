@@ -109,7 +109,7 @@ class OrderService(
 
         // Fail payment if it exists
         order.payment?.let { payment ->
-            paymentService.failPayment(payment.stripePaymentIntentId, reason)
+            paymentService.failPayment(payment.stripePaymentIntentId)
         }
 
         return orderRepository.save(order)

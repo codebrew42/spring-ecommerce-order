@@ -36,8 +36,6 @@ class Payment(
     var paymentMethod: PaymentMethod? = PaymentMethod.CARD,
     @Column(name = "stripe_charge_id", nullable = true)
     var stripeChargeId: String? = null,
-    @Column(name = "failure_reason", nullable = true)
-    var failureReason: String? = null,
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,

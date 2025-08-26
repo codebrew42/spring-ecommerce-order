@@ -18,5 +18,4 @@ data class PaymentStatusResponse(
     val amount: Double,
     val currency: Currency,
     val paymentMethod: PaymentMethod?,
-    val failureReason: String?,
 )

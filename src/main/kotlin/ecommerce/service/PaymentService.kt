@@ -73,23 +73,18 @@ class PaymentService(
         payment.status = PaymentStatus.COMPLETED
         payment.stripeChargeId = stripeChargeId
         payment.paymentMethod = paymentMethod
-        payment.failureReason = null
 
         return paymentRepository.save(payment)
     }
 
     @Transactional
-    fun failPayment(
-        stripePaymentIntentId: String,
-        failureReason: String,
-    ): Payment {
+    fun failPayment(stripePaymentIntentId: String): Payment {
         val payment =
             paymentRepository.findByStripePaymentIntentId(stripePaymentIntentId)
                 ?: throw NotFoundException("Payment not found for payment intent: $stripePaymentIntentId")
 
         // Update payment status
         payment.status = PaymentStatus.FAILED
-        payment.failureReason = failureReason
 
         return paymentRepository.save(payment)
     }
@@ -123,7 +118,6 @@ class PaymentService(
             amount = payment.amount,
             currency = payment.currency,
             paymentMethod = payment.paymentMethod,
-            failureReason = payment.failureReason,
         )
     }
 
