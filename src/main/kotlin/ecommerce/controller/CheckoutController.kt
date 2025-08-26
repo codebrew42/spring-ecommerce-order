@@ -1,13 +1,11 @@
 package ecommerce.controller
 
-import ecommerce.auth.AuthenticatedUser
 import ecommerce.config.StripeClient
+import ecommerce.dto.auth.AuthenticatedUser
 import ecommerce.dto.checkout.CheckoutResponse
 import ecommerce.dto.order.CreateOrderRequest
 import ecommerce.dto.order.toResponse
 import ecommerce.dto.payment.PaymentIntentRequest
-import ecommerce.model.Member
-import ecommerce.model.PaymentMethod
 import ecommerce.service.OrderService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -26,15 +24,15 @@ class CheckoutController(
     @PostMapping
     fun createOrder(
         @Valid @RequestBody request: CreateOrderRequest,
-        @AuthenticatedUser member: Member,
+        user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
-        val order = orderService.createOrder(request, member.id)
+        val order = orderService.createOrder(request, user.userId)
 
         val paymentIntentRequest =
             PaymentIntentRequest(
                 amount = order.totalAmount,
                 currency = order.currency,
-                paymentMethod = PaymentMethod.valueOf(request.paymentMethod.uppercase()),
+                paymentMethod = request.paymentMethod,
             )
 
         val stripeResponse =
@@ -54,11 +52,11 @@ class CheckoutController(
     @PostMapping("/confirm/{orderId}")
     fun confirmPayment(
         @PathVariable orderId: Long,
-        @AuthenticatedUser member: Member,
+        user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
         val order = orderService.getById(orderId)
 
-        if (order.member.id != member.id) {
+        if (order.member.id != user.userId) {
             throw IllegalArgumentException("Order does not belong to member")
         }
 
