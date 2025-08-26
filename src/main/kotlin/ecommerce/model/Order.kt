@@ -25,9 +25,9 @@ class Order(
     @JoinColumn(name = "member_id", nullable = false)
     val member: Member,
     @Column(name = "stripe_checkout_session_id", nullable = true)
-    val stripeCheckoutSessionId: String? = null,
+    var stripeCheckoutSessionId: String? = null,
     @Column(name = "stripe_payment_intent_id", nullable = true)
-    val stripePaymentIntentId: String? = null,
+    var stripePaymentIntentId: String? = null,
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
     var orderStatus: OrderStatus = OrderStatus.PENDING,

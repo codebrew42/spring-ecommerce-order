@@ -7,6 +7,7 @@ import ecommerce.dto.order.CreateOrderRequest
 import ecommerce.dto.order.toResponse
 import ecommerce.dto.payment.PaymentIntentRequest
 import ecommerce.exception.FailedPaymentException
+import ecommerce.model.OrderStatus
 import ecommerce.service.OrderService
 import ecommerce.service.PaymentService
 import jakarta.validation.Valid
@@ -42,7 +43,15 @@ class CheckoutController(
             stripeClient.createCheckoutSession(paymentIntentRequest)
                 ?: throw FailedPaymentException("Failed to create Stripe PaymentIntent")
 
-        val checkoutResponse = paymentService.createPaymentIntent(paymentIntentRequest)
+        val checkoutResponse =
+            try {
+                paymentService.createPaymentIntent(paymentIntentRequest)
+            } catch (_: FailedPaymentException) {
+                throw FailedPaymentException("Payment failed.")
+            }
+        order.orderStatus = OrderStatus.CONFIRMED
+        order.stripeCheckoutSessionId = checkoutResponse.id
+
 
         return ResponseEntity.ok(checkoutResponse)
     }

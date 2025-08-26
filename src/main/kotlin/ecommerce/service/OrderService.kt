@@ -51,7 +51,9 @@ class OrderService(
         request.cartItemIds.forEach { cartItemId ->
             val cartItem =
                 cartItemRepository.findById(cartItemId)
-                    .orElseThrow { NotFoundException("Cart item not found with id: $cartItemId") }
+                    .orElseThrow {
+                        NotFoundException("Cart item not found with id: $cartItemId")
+                    }
 
             val orderItem = createOrderItemFromCart(cartItem, order)
             order.addOrderItem(orderItem)
