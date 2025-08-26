@@ -55,7 +55,7 @@ class CartItemServiceTest {
         testMember = Member("test@example.com", "password", "Test User", Role.USER, id = 1L)
         testCart = Cart(member = testMember, id = 1L)
         testProduct = Product("Test Product", 99.99, 10, "https://example.com/image.jpg", id = 1L)
-        testProductOption = ProductOption("Red", 5, testProduct, id = 1L)
+        testProductOption = ProductOption("Red", 5, testProduct, price = 30.0, id = 1L)
         testCartItem = CartItem(testCart, testProductOption, 2, LocalDateTime.now(), id = 1L)
     }
 

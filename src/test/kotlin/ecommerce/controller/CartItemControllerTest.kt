@@ -30,8 +30,7 @@ class CartItemControllerTest {
             )
 
         val response =
-            cartItemController.updateCartItem(
-                1,
+            cartItemController.addToCart(
                 1,
                 addToCartRequest,
             )
@@ -50,7 +49,7 @@ class CartItemControllerTest {
             )
 
         val response =
-            cartItemController.addCartItemToCart(
+            cartItemController.addToCart(
                 1,
                 addToCartRequest,
             )
@@ -70,7 +69,7 @@ class CartItemControllerTest {
             )
 
         val response =
-            cartItemController.addCartItemToCart(
+            cartItemController.addToCart(
                 1,
                 addToCartRequest,
             )

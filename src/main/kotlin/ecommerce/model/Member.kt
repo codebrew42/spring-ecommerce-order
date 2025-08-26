@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
@@ -23,7 +24,11 @@ class Member(
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     val role: Role = Role.USER,
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime? = null,
     @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

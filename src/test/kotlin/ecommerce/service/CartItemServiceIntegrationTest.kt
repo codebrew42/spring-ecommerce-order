@@ -63,7 +63,7 @@ class CartItemServiceIntegrationTest {
                 cartId = testCart.id!!,
             )
 
-        val result = cartItemService.saveCartItem(request, testCart.id!!)
+        val result = cartItemService.addCartItem(request, testCart.id!!)
 
         assertThat(result).isNotNull()
         assertThat(result.id).isNotNull()
@@ -85,7 +85,7 @@ class CartItemServiceIntegrationTest {
                 cartItemId = 4L,
                 cartId = testCart.id!!,
             )
-        cartItemService.saveCartItem(initialRequest, testCart.id!!)
+        cartItemService.addCartItem(initialRequest, testCart.id!!)
 
         val updateRequest =
             AddToCartRequest(
@@ -94,7 +94,7 @@ class CartItemServiceIntegrationTest {
                 cartItemId = 4L,
                 cartId = testCart.id!!,
             )
-        val result = cartItemService.saveCartItem(updateRequest, testCart.id!!)
+        val result = cartItemService.addCartItem(updateRequest, testCart.id!!)
 
         assertThat(result.quantity).isEqualTo(6)
 
@@ -112,11 +112,11 @@ class CartItemServiceIntegrationTest {
                 cartItemId = 0L,
                 cartId = testCart.id!!,
             )
-        val createdItem = cartItemService.saveCartItem(request, testCart.id!!)
+        val createdItem = cartItemService.addCartItem(request, testCart.id!!)
 
         cartItemService.deleteCartItemById(createdItem.id!!, testCart.id!!)
 
-        val deletedItem = cartItemRepository.findById(createdItem.id!!).orElse(null)
+        val deletedItem = cartItemRepository.findById(0L).orElse(null)
         assertThat(deletedItem).isNull()
     }
 

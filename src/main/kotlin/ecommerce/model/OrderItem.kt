@@ -9,6 +9,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
 @Entity
@@ -26,10 +28,12 @@ class OrderItem(
     var unitPrice: Double,
     @Column(name = "total_price", nullable = false)
     var totalPrice: Double,
-    @Column(name = "created_at", nullable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    var createdAt: LocalDateTime? = null,
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: LocalDateTime = LocalDateTime.now(),
+    var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
@@ -50,6 +54,6 @@ class OrderItem(
     }
 
     override fun toString(): String {
-        return "OrderItem(id=$id, orderId=${order.id}, productOptionId=${productOption.id}, quantity=$quantity, unitPrice=$unitPrice)"
+        return "OrderItem(id=$id, productOptionId=${productOption.id}, quantity=$quantity, unitPrice=$unitPrice)"
     }
 }

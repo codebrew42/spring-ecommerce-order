@@ -1,11 +1,40 @@
 package ecommerce.service
 
+import ecommerce.exception.NotFoundException
+import ecommerce.model.Order
+import ecommerce.repository.OrderRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+
 @Service
-class OrderService() {
+class OrderService(
+    private val orderRepository: OrderRepository,
+) {
+    fun findAllOrders(pageable: Pageable): Page<Order> {
+        return orderRepository.findAll(pageable)
+    }
 
+    fun findOrderById(id: Long): Order {
+        return orderRepository.findById(id).orElseThrow {
+            NotFoundException("Order with id $id not found")
+        }
+    }
+
+    fun findOrdersByMemberId(
+        memberId: Long,
+        pageable: Pageable,
+    ): Page<Order> {
+        return orderRepository.findByMemberId(memberId, pageable)
+    }
+
+    fun deleteById(id: Long) {
+        orderRepository.findById(id).orElseThrow {
+            NotFoundException("Order with id $id not found")
+        }
+        orderRepository.deleteById(id)
+    }
 }
-
 
 /*
 @Service
@@ -25,7 +54,7 @@ class OrderService(
 //            ?: throw NotFoundException("Order with id $id not found")
 //    }
 //
-//    fun getOrdersPageForMember(memberId: Long, page: Int, size: Int): Map<String, Any> {
+//    fun getOrdersByMemberId(memberId: Long, page: Int, size: Int): Map<String, Any> {
 //        val pageable: Pageable = PageRequest.of(page, size)
 //        val ordersPage: Page<Order> = orderRepository.findByMemberId(memberId, pageable)
 //        return mapOf(

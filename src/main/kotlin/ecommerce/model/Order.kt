@@ -28,13 +28,15 @@ class Order(
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status", nullable = false)
     val orderStatus: OrderStatus,
-    @Column(name = "total_amount", nullable = false)
-    var totalAmount: Double,
+    @Column(name = "total_amount")
+    var totalAmount: Double? = null,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     val orderItems: MutableList<OrderItem> = mutableListOf(),
     @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,
     @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime? = null,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +59,6 @@ class Order(
     }
 
     override fun toString(): String {
-        val amount = getTotalAmount()
-        return "Order(id=$id, stripeCheckoutSessionId='$stripeCheckoutSessionId', status=$orderStatus, amount=$amount)"
+        return "Order(id=$id, stripeCheckoutSessionId='$stripeCheckoutSessionId', status=$orderStatus)"
     }
 }
