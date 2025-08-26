@@ -34,15 +34,6 @@ class Member(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    constructor(
-        email: String,
-        name: String,
-    ) : this(
-        email = email,
-        password = "",
-        name = name,
-    )
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Member) return false
@@ -55,7 +46,7 @@ class Member(
     }
 
     override fun hashCode(): Int {
-        return email.hashCode()
+        return id?.hashCode() ?: email.hashCode()
     }
 
     fun updateProfile(
@@ -64,10 +55,6 @@ class Member(
     ) {
         this.email = newEmail
         this.name = newName
-    }
-
-    fun updateTimestamp() {
-        this.updatedAt = LocalDateTime.now()
     }
 
     override fun toString(): String {

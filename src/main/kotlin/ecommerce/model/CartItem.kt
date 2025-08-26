@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
@@ -15,12 +16,16 @@ import java.time.LocalDateTime
 import java.util.Objects
 
 @Entity
-@Table(name = "cart_items")
+@Table(
+    name = "cart_items",
+    indexes = [
+        Index(name = "idx_cart_item_cart_id", columnList = "cart_id"),
+    ],
+)
 class CartItem(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = true)
     var cart: Cart,
-    // TODO check EAGER or LAZY
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_option_id")
     var productOption: ProductOption,
@@ -48,7 +53,7 @@ class CartItem(
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(cart.id, productOption.id)
+        return id?.hashCode() ?: Objects.hash(cart.id, productOption.id)
     }
 
     override fun toString(): String {

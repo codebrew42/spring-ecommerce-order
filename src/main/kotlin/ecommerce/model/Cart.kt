@@ -1,7 +1,5 @@
 package ecommerce.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
@@ -10,10 +8,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import org.hibernate.annotations.BatchSize
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
@@ -29,10 +25,6 @@ class Cart(
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = true)
     val member: Member? = null,
-    @OneToMany(mappedBy = "cart", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
-    @BatchSize(size = 20)
-    @JsonIgnore
-    val cartItem: MutableList<CartItem> = mutableListOf(),
     @Column(name = "quantity", nullable = false)
     var quantity: Int = 0,
     @CreationTimestamp
@@ -57,10 +49,10 @@ class Cart(
     }
 
     override fun hashCode(): Int {
-        return member?.hashCode() ?: 0
+        return id?.hashCode() ?: (member?.hashCode() ?: 0)
     }
 
     override fun toString(): String {
-        return "Cart(id=$id, memberId=${member?.id}, cartItemCount=${cartItem.size}, quantity=$quantity)"
+        return "Cart(id=$id, memberId=${member?.id}, quantity=$quantity)"
     }
 }
