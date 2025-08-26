@@ -63,23 +63,13 @@ class Order(
         calculateTotalAmount()
     }
 
-    fun confirmPayment(stripePaymentIntentId: String) {
-        this.paymentStatus = PaymentStatus.COMPLETED
-        this.orderStatus = OrderStatus.CONFIRMED
-        // Update the payment entity if it exists
-        payment?.markAsCompleted(stripePaymentIntentId, payment!!.paymentMethod ?: "unknown")
-    }
+    fun isPaymentCompleted(): Boolean = paymentStatus == PaymentStatus.COMPLETED
 
-    fun failPayment(reason: String? = null) {
-        this.paymentStatus = PaymentStatus.FAILED
-        this.orderStatus = OrderStatus.CANCELLED
-        // Update the payment entity if it exists
-        reason?.let { payment?.markAsFailed(it) }
-    }
+    fun isPending(): Boolean = orderStatus == OrderStatus.PENDING
 
-    fun isPaymentCompleted(): Boolean {
-        return paymentStatus == PaymentStatus.COMPLETED
-    }
+    fun isConfirmed(): Boolean = orderStatus == OrderStatus.CONFIRMED
+
+    fun canBeCancelled(): Boolean = orderStatus in listOf(OrderStatus.PENDING, OrderStatus.CONFIRMED)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

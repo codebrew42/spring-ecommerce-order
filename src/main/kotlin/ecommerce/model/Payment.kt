@@ -31,8 +31,9 @@ class Payment(
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     var status: PaymentStatus = PaymentStatus.PENDING,
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = true)
-    var paymentMethod: String? = null,
+    var paymentMethod: PaymentMethod? = PaymentMethod.CARD,
     @Column(name = "stripe_charge_id", nullable = true)
     var stripeChargeId: String? = null,
     @Column(name = "failure_reason", nullable = true)
@@ -47,28 +48,14 @@ class Payment(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 ) {
-    fun markAsCompleted(
-        stripeChargeId: String,
-        paymentMethod: String,
-    ) {
-        this.status = PaymentStatus.COMPLETED
-        this.stripeChargeId = stripeChargeId
-        this.paymentMethod = paymentMethod
-        this.failureReason = null
-    }
+    // Simple state checks - domain logic
+    fun isCompleted(): Boolean = status == PaymentStatus.COMPLETED
 
-    fun markAsFailed(reason: String) {
-        this.status = PaymentStatus.FAILED
-        this.failureReason = reason
-    }
+    fun isPending(): Boolean = status == PaymentStatus.PENDING
 
-    fun markAsRefunded() {
-        this.status = PaymentStatus.REFUNDED
-    }
+    fun isFailed(): Boolean = status == PaymentStatus.FAILED
 
-    fun isCompleted(): Boolean {
-        return status == PaymentStatus.COMPLETED
-    }
+    fun isRefunded(): Boolean = status == PaymentStatus.REFUNDED
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

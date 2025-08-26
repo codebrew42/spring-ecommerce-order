@@ -1,12 +1,7 @@
 package ecommerce.dto.payment
 
 import ecommerce.model.Currency
-
-data class PaymentRequest(
-    val amount: Double,
-    val currency: Currency,
-    val paymentMethod: String,
-)
+import ecommerce.model.PaymentMethod
 
 data class CreatePaymentIntentRequest(
     val orderId: Long,
@@ -22,6 +17,6 @@ data class PaymentStatusResponse(
     val status: String,
     val amount: Double,
     val currency: Currency,
-    val paymentMethod: String?,
+    val paymentMethod: PaymentMethod?,
     val failureReason: String?,
 )
