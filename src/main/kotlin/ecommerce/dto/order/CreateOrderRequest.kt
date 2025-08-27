@@ -7,6 +7,7 @@ data class CreateOrderRequest(
     @field:NotEmpty(message = "Cart items are required")
     val cartItemIds: List<Long>,
     val currency: Currency = Currency.EUR,
+    val paymentMethod: String = "pm_card_visa",
 )
 
 data class CreateOrderItemRequest(

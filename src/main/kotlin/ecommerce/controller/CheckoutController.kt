@@ -1,6 +1,7 @@
 package ecommerce.controller
 
 import ecommerce.dto.auth.AuthenticatedUser
+import ecommerce.auth.AuthenticatedUser as AuthenticatedUserParam
 import ecommerce.dto.checkout.CheckoutResponse
 import ecommerce.dto.order.CreateOrderRequest
 import ecommerce.dto.order.toResponse
@@ -8,12 +9,14 @@ import ecommerce.dto.payment.PaymentIntentRequest
 import ecommerce.service.OrderService
 import ecommerce.service.PaymentService
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 
 @RequestMapping("/api/checkout")
 @RestController
@@ -24,7 +27,7 @@ class CheckoutController(
     @PostMapping
     fun processCheckout(
         @Valid @RequestBody request: CreateOrderRequest,
-        user: AuthenticatedUser,
+        @AuthenticatedUserParam user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
         val order = orderService.createOrder(request, user.userId)
 
@@ -32,7 +35,7 @@ class CheckoutController(
             PaymentIntentRequest(
                 amount = order.totalAmount,
                 currency = order.currency,
-                paymentMethod = "pm_card_visa",
+                paymentMethod = request.paymentMethod,
             )
 
         val checkoutResponse = paymentService.processPayment(paymentIntentRequest, order)
@@ -43,12 +46,12 @@ class CheckoutController(
     @PostMapping("/confirm/{orderId}")
     fun confirmCheckout(
         @PathVariable orderId: Long,
-        user: AuthenticatedUser,
+        @AuthenticatedUserParam user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
         val order = orderService.getById(orderId)
 
         if (order.member.id != user.userId) {
-            throw IllegalArgumentException("Order does not belong to member")
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Order does not belong to member")
         }
 
         orderService.confirmOrderPayment(orderId)
