@@ -2,7 +2,7 @@ package ecommerce.dto.cart
 
 import jakarta.validation.constraints.NotNull
 
-data class AddToCartRequest(
+class AddToCartRequest(
     @field:NotNull(message = "Product ID is required")
     val productOptionId: Long,
     @field:NotNull(message = "Quantity is required")
