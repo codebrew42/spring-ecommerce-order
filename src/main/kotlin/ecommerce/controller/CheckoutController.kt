@@ -1,7 +1,6 @@
 package ecommerce.controller
 
 import ecommerce.dto.auth.AuthenticatedUser
-import ecommerce.auth.AuthenticatedUser as AuthenticatedUserParam
 import ecommerce.dto.checkout.CheckoutResponse
 import ecommerce.dto.order.CreateOrderRequest
 import ecommerce.dto.order.toResponse
@@ -27,7 +26,7 @@ class CheckoutController(
     @PostMapping
     fun processCheckout(
         @Valid @RequestBody request: CreateOrderRequest,
-        @AuthenticatedUserParam user: AuthenticatedUser,
+        user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
         val order = orderService.createOrder(request, user.userId)
 
@@ -46,7 +45,7 @@ class CheckoutController(
     @PostMapping("/confirm/{orderId}")
     fun confirmCheckout(
         @PathVariable orderId: Long,
-        @AuthenticatedUserParam user: AuthenticatedUser,
+        user: AuthenticatedUser,
     ): ResponseEntity<CheckoutResponse> {
         val order = orderService.getById(orderId)
 

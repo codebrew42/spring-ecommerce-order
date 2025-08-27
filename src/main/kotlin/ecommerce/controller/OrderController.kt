@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 
 @RequestMapping("/api/orders")
 @RestController
@@ -31,13 +32,21 @@ class OrderController(
         val order = orderService.getById(id)
         // Security check: User can only view their own orders (unless admin)
         if (order.member.id != user.userId && !user.isAdmin()) {
-            throw IllegalArgumentException("Access denied: Cannot view orders for different member")
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: Cannot view orders for different member")
         }
         return order.toResponse()
     }
 
     @GetMapping()
-    fun getOrders(pageable: Pageable): Page<OrderResponse> = orderService.findAllOrders(pageable)
+    fun getOrders(
+        pageable: Pageable,
+        user: AuthenticatedUser,
+    ): Page<OrderResponse> {
+        if (!user.isAdmin()) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: Admin privileges required")
+        }
+        return orderService.findAllOrders(pageable)
+    }
 
     @PostMapping("/place")
     fun placeOrder(
@@ -57,19 +66,6 @@ class OrderController(
         return ResponseEntity.ok(result)
     }
 
-    @GetMapping("/member/{memberId}")
-    fun getOrdersByMemberId(
-        @PathVariable memberId: Long,
-        pageable: Pageable,
-        user: AuthenticatedUser,
-    ): ResponseEntity<Page<OrderResponse>> {
-        if (user.userId != memberId) {
-            throw IllegalArgumentException("Access denied: Cannot view orders for different member")
-        }
-        val result = orderService.getOrdersByMember(memberId, pageable)
-        return ResponseEntity.ok(result)
-    }
-
     @DeleteMapping("/{id}")
     fun deleteOrderById(
         @PathVariable id: Long,
@@ -77,7 +73,7 @@ class OrderController(
     ): ResponseEntity<Unit> {
         val order = orderService.getById(id)
         if (order.member.id != user.userId) {
-            throw IllegalArgumentException("Access denied: Cannot delete orders for different member")
+            throw ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied: Cannot delete orders for different member")
         }
         orderService.deleteById(id)
         return ResponseEntity.noContent().build()
