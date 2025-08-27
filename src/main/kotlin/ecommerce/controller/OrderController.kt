@@ -63,7 +63,6 @@ class OrderController(
         pageable: Pageable,
         user: AuthenticatedUser,
     ): ResponseEntity<Page<OrderResponse>> {
-        // Security check
         if (user.userId != memberId) {
             throw IllegalArgumentException("Access denied: Cannot view orders for different member")
         }
@@ -76,7 +75,6 @@ class OrderController(
         @PathVariable id: Long,
         user: AuthenticatedUser,
     ): ResponseEntity<Unit> {
-        // Security check
         val order = orderService.getById(id)
         if (order.member.id != user.userId) {
             throw IllegalArgumentException("Access denied: Cannot delete orders for different member")
